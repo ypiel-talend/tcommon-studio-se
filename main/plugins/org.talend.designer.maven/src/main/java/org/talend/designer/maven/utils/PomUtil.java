@@ -71,6 +71,7 @@ import org.talend.core.runtime.maven.MavenUrlHelper;
 import org.talend.core.ui.branding.IBrandingService;
 import org.talend.designer.maven.model.TalendMavenConstants;
 import org.talend.designer.maven.template.MavenTemplateManager;
+import org.talend.designer.maven.tools.ProcessorDependenciesManager;
 import org.talend.designer.runprocess.IProcessor;
 import org.talend.repository.ProjectManager;
 import org.w3c.dom.Attr;
@@ -735,4 +736,24 @@ public class PomUtil {
             }
         }
     }
+    
+    public static void updatePomDependenciesFromProcessor(IProcessor processor) throws Exception {
+        IFile pomFile = processor.getTalendJavaProject().getProjectPom();
+        // add routines dependency
+        Model model = MODEL_MANAGER.readMavenModel(pomFile);
+        final List<Dependency> dependencies = model.getDependencies();
+        dependencies.clear();
+        String projectTechName = ProjectManager.getInstance().getCurrentProject().getTechnicalLabel();
+        String codeVersion = PomIdsHelper.getCodesVersion();
+        String routinesGroupId = PomIdsHelper.getCodesGroupId(projectTechName, TalendMavenConstants.DEFAULT_CODE);
+        String routinesArtifactId = TalendMavenConstants.DEFAULT_ROUTINES_ARTIFACT_ID;
+        Dependency routinesDependency = createDependency(routinesGroupId, routinesArtifactId, codeVersion, null);
+        dependencies.add(routinesDependency);
+        // add dependencies from process
+        ProcessorDependenciesManager manager = new ProcessorDependenciesManager(processor);
+        manager.updateDependencies(null, model);
+        
+        savePom(null, model, pomFile);
+    }
+
 }
