@@ -29,8 +29,6 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.talend.commons.exception.ExceptionHandler;
-import org.talend.core.GlobalServiceRegister;
-import org.talend.core.model.general.ILibrariesService;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -50,11 +48,27 @@ public class DynamicServiceUtil {
         serviceRegistration.unregister();
     }
 
+    /**
+     * Don't forget to clean cache if needed
+     * 
+     * @param bundle
+     * @param plugin
+     * @return
+     * @throws Exception
+     */
     public static boolean addContribution(Bundle bundle, IDynamicPlugin plugin) throws Exception {
         String xml = plugin.toXmlString();
         return addContribution(bundle, xml);
     }
 
+    /**
+     * Don't forget to clean cache if needed
+     * 
+     * @param bundle
+     * @param xmlStr
+     * @return
+     * @throws Exception
+     */
     public static boolean addContribution(Bundle bundle, String xmlStr) throws Exception {
 
         ByteArrayInputStream is = new ByteArrayInputStream(xmlStr.getBytes("UTF-8")); //$NON-NLS-1$
@@ -65,7 +79,6 @@ public class DynamicServiceUtil {
             IContributor contributor = ContributorFactoryOSGi.createContributor(bundle);
 
             boolean succeed = extensionRegistry.addContribution(is, contributor, false, null, null, userToken);
-            getLibrariesService().resetModulesNeeded();
             return succeed;
         } finally {
             try {
@@ -77,6 +90,12 @@ public class DynamicServiceUtil {
 
     }
 
+    /**
+     * Don't forget to clean cache if needed
+     * 
+     * @param plugin
+     * @return
+     */
     public static boolean removeContribution(IDynamicPlugin plugin) {
         boolean succeed = true;
 
@@ -92,7 +111,6 @@ public class DynamicServiceUtil {
                     succeed = false;
                 }
             }
-            getLibrariesService().resetModulesNeeded();
         }
 
         return succeed;
@@ -150,7 +168,4 @@ public class DynamicServiceUtil {
         }
     }
 
-    public static ILibrariesService getLibrariesService() {
-        return (ILibrariesService) GlobalServiceRegister.getDefault().getService(ILibrariesService.class);
-    }
 }
