@@ -224,20 +224,16 @@ public abstract class AbstractLibrariesService implements ILibrariesService {
         if (GlobalServiceRegister.getDefault().isServiceRegistered(IRunProcessService.class)) {
             IRunProcessService processService = (IRunProcessService) GlobalServiceRegister.getDefault().getService(
                     IRunProcessService.class);
-            ITalendProcessJavaProject talendProcessJavaProject = processService.getTalendProcessJavaProject();
-            if (talendProcessJavaProject != null) {
-                IFolder javaLibFolder = talendProcessJavaProject.getLibFolder();
-                if (javaLibFolder.exists()) {
-                    File libFolder = javaLibFolder.getLocation().toFile();
-                    for (File externalLib : libFolder.listFiles(FilesUtils.getAcceptJARFilesFilter())) {
-                        if (externalLib.getName().equals(lib.getName())) {
-                            FilesUtils.copyFile(lib, externalLib);
-                        }
+            IFolder javaLibFolder = processService.getJavaProjectLibFolder();
+            if (javaLibFolder.exists()) {
+                File libFolder = javaLibFolder.getLocation().toFile();
+                for (File externalLib : libFolder.listFiles(FilesUtils.getAcceptJARFilesFilter())) {
+                    if (externalLib.getName().equals(lib.getName())) {
+                        FilesUtils.copyFile(lib, externalLib);
                     }
                 }
             }
         }
-
     }
 
     protected void addResolvedClasspathPath(String libName) {

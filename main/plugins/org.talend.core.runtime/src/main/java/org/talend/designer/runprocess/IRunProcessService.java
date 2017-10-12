@@ -180,6 +180,7 @@ public interface IRunProcessService extends IService {
 
     public boolean isJobRunning();
 
+    @Deprecated
     public void buildJavaProject();
 
     /**
