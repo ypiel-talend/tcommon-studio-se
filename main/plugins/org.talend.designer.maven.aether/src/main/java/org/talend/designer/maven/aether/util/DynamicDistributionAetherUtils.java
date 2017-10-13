@@ -17,9 +17,11 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.codehaus.plexus.util.StringUtils;
@@ -155,12 +157,12 @@ public class DynamicDistributionAetherUtils {
 
         VersionRangeResult rangeResult = repSystem.resolveVersionRange(repSysSession, verRangeRequest);
         List<Version> versions = rangeResult.getVersions();
-        List<String> versionList = new ArrayList<>();
+        Set<String> versionSet = new HashSet<>();
         for (Version version : versions) {
-            versionList.add(version.toString());
+            versionSet.add(version.toString());
         }
 
-        return versionList;
+        return new ArrayList<String>(versionSet);
     }
 
     private static DependencyNode convert(org.eclipse.aether.graph.DependencyNode node) {
