@@ -37,6 +37,10 @@ public class TalendJavaProjectConstants {
 
     public static final String DIR_PROCESS_STORM = ERepositoryObjectType.PROCESS_STORM.getFolder();
     
+    public static final String DIR_PROCESS_ROUTES = "routes"; //$NON-NLS-1$
+    
+    public static final String DIR_PROCESS_SERVICES = "services"; //$NON-NLS-1$
+    
     public static final String CLASSPATH_FILE_NAME = ".classpath"; //$NON-NLS-1$
 
     public static final String PROJECT_FILE_NAME = ".project"; //$NON-NLS-1$
