@@ -288,7 +288,7 @@ public final class ProxyRepositoryFactory implements IProxyRepositoryFactory {
     }
 
     /* hywang for 17295,need to migration refProjects when login using svn repository */
-    private void executeMigrations(Project mainProject, boolean beforeLogon, SubMonitor monitorWrap) {
+    private void executeMigrations(Project mainProject, boolean beforeLogon, SubMonitor monitorWrap) throws PersistenceException {
         this.repositoryFactoryFromProvider.executeMigrations(mainProject, beforeLogon, monitorWrap);
     }
 
@@ -2036,8 +2036,6 @@ public final class ProxyRepositoryFactory implements IProxyRepositoryFactory {
             logOffProject();
             throw e;
         }
-        
-        this.repositoryFactoryFromProvider.migrateReferenceSetting(project);
     }
     
     private void checkReferenceProjectsProblems(Project project)

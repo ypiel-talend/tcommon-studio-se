@@ -229,8 +229,8 @@ public class ReferenceProjectProvider implements IReferenceProjectProvider {
         return null;
     }
 
-    public static void removeAllTacReferenceList() {
-        tacReferenceMap.clear();
+    public static void removeTacReferenceList(String projectLabel) {
+        tacReferenceMap.remove(projectLabel);
     }
 }
 

@@ -827,8 +827,7 @@ public class LocalRepositoryFactory extends AbstractEMFRepositoryFactory impleme
                 }
             }
         }
-        // Clear the reference project data
-        project.getEmfProject().getReferencedProjects().clear();
+
         Resource projectResource = project.getEmfProject().eResource();
         if (projectResource == null) {
             if (project.getEmfProject() != null && project.getEmfProject().eIsProxy()) {
@@ -3445,7 +3444,7 @@ public class LocalRepositoryFactory extends AbstractEMFRepositoryFactory impleme
     }
 
     @Override
-    public void executeMigrations(Project mainProject, boolean beforeLogon, SubMonitor monitorWrap) {
+    public void executeMigrations(Project mainProject, boolean beforeLogon, SubMonitor monitorWrap) throws PersistenceException{
         IMigrationToolService service = (IMigrationToolService) GlobalServiceRegister.getDefault().getService(
                 IMigrationToolService.class);
         service.executeMigrationTasksForLogon(mainProject, beforeLogon, monitorWrap);
@@ -3520,9 +3519,5 @@ public class LocalRepositoryFactory extends AbstractEMFRepositoryFactory impleme
 
     public byte[] getReferenceSettingContent(Project project, String branch) throws PersistenceException {
         return null;
-    }
-
-    public void migrateReferenceSetting(final Project project) throws PersistenceException, LoginException {
-        // nothing to do
     }
 }

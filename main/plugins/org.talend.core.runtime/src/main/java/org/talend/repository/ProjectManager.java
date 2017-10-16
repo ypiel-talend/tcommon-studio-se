@@ -142,29 +142,10 @@ public final class ProjectManager {
             RepositoryContext repositoryContext = (RepositoryContext) ctx.getProperty(Context.REPOSITORY_CONTEXT_KEY);
             if (repositoryContext != null) {
                 currentProject = repositoryContext.getProject();
-                if (currentProject != null) {
-                    resolveRefProject(currentProject.getEmfProject(), new HashSet<String>());
-                }
                 return;
             }
         }
         currentProject = null;
-    }
-
-    private void resolveRefProject(org.talend.core.model.properties.Project p, Set<String> resolvedProjectLabels) {
-        Context ctx = CoreRuntimePlugin.getInstance().getContext();
-        if (p != null && ctx != null) {
-            String parentBranch = ProjectManager.getInstance().getMainProjectBranch(p);
-            if (parentBranch != null) {
-                resolvedProjectLabels.add(p.getTechnicalLabel());
-                for (ProjectReference pr : new Project(p).getProjectReferenceList()) {
-                    if (ProjectManager.validReferenceProject(p, pr)
-                            && !resolvedProjectLabels.contains(pr.getReferencedProject().getTechnicalLabel())) {
-                        resolveRefProject(pr.getReferencedProject(), resolvedProjectLabels); // only to resolve all
-                    }
-                }
-            }
-        }
     }
 
     private void resolveSubRefProject(org.talend.core.model.properties.Project p, List<Project> allReferencedprojects,
@@ -182,37 +163,6 @@ public final class ProjectManager {
                         allReferencedprojects.add(project);
                         resolveSubRefProject(pr.getReferencedProject(), allReferencedprojects, resolvedProjectLabels); // only to resolve all
                     }
-                }
-            }
-        }
-    }
-
-    /**
-     *
-     * retrieve the referenced projects of current project.
-     */
-    public void retrieveReferencedProjects(List<Project> referencedprojects) {
-        referencedprojects.clear();
-        if (GlobalServiceRegister.getDefault().isServiceRegistered(IProxyRepositoryService.class)) {
-            IProxyRepositoryService service = (IProxyRepositoryService) GlobalServiceRegister.getDefault()
-                    .getService(IProxyRepositoryService.class);
-            IProxyRepositoryFactory factory = service.getProxyRepositoryFactory();
-            if (factory != null) {
-                retrieveReferencedProjects(factory, this.getCurrentProject(), referencedprojects);
-            }
-        }
-    }
-
-    public void retrieveReferencedProjects(IProxyRepositoryFactory proxyRepositoryFactory, Project mainProject,
-            List<Project> referencedprojects) {
-        referencedprojects.clear();
-        if (proxyRepositoryFactory != null) {
-            List<org.talend.core.model.properties.Project> rProjects = proxyRepositoryFactory.getReferencedProjects(mainProject);
-            if (rProjects != null) {
-                for (org.talend.core.model.properties.Project p : rProjects) {
-                    Project project = new Project(p);
-                    resolveRefProject(p, new HashSet<String>());
-                    referencedprojects.add(project);
                 }
             }
         }
@@ -237,15 +187,7 @@ public final class ProjectManager {
      * return the referenced projects of current project.
      */
     public List<Project> getReferencedProjects() {
-        List<Project> referencedprojects = new ArrayList<Project>();
-        retrieveReferencedProjects(referencedprojects);
-        return referencedprojects;
-    }
-
-    public List<Project> getReferencedProjects(IProxyRepositoryFactory proxyRepositoryFactory, Project project) {
-        List<Project> referencedprojects = new ArrayList<Project>();
-        retrieveReferencedProjects(proxyRepositoryFactory, project, referencedprojects);
-        return referencedprojects;
+        return getReferencedProjects(currentProject);
     }
 
     /**
@@ -283,11 +225,7 @@ public final class ProjectManager {
      * return the referenced projects of the project.
      */
     public List<Project> getReferencedProjects(Project project) {
-        Context ctx = CoreRuntimePlugin.getInstance().getContext();
-        if (project != null && ctx != null) {
-            if (project.equals(this.currentProject)) {
-                return getReferencedProjects();
-            }
+        if (project != null) {
             List<Project> refProjects = new ArrayList<Project>();
             for (ProjectReference refProject : project.getProjectReferenceList()) {
                 if (ProjectManager.validReferenceProject(project.getEmfProject(), refProject)) {
@@ -661,7 +599,6 @@ public final class ProjectManager {
      * Expected to be called when logoff project, to clear all infos in memory.
      */
     public void clearAll() {
-        getAllReferencedProjects().clear();
         mapProjectUrlToBranchUrl.clear();
         clearFolderCache();
     }

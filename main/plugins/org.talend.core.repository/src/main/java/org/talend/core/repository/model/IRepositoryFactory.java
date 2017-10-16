@@ -391,7 +391,7 @@ public interface IRepositoryFactory {
 
     public boolean canUnlock(Item item) throws PersistenceException;
 
-    public void executeMigrations(Project mainProject, boolean beforeLogon, SubMonitor monitorWrap);
+    public void executeMigrations(Project mainProject, boolean beforeLogon, SubMonitor monitorWrap) throws PersistenceException;
 
     public RootContainer<String, IRepositoryViewObject> getRootContainerFromType(Project project, ERepositoryObjectType type);
 
@@ -432,6 +432,4 @@ public interface IRepositoryFactory {
     public void loadProjectAndSetContext(IProject eclipseProject) throws PersistenceException;
     
     public byte[] getReferenceSettingContent(Project project, String branch) throws PersistenceException;
-    
-    public void migrateReferenceSetting(final Project project) throws PersistenceException, LoginException;
 }
