@@ -567,8 +567,7 @@ public class RelationshipItemBuilder {
 
         loadRelations(currentProjectItemsRelations, getAimProject());
 
-        List<Project> referencedProjects = ProjectManager.getInstance().getReferencedProjects(getProxyRepositoryFactory(),
-                getAimProject());
+        List<Project> referencedProjects = ProjectManager.getInstance().getAllReferencedProjects();
         for (Project p : referencedProjects) {
             loadRelations(referencesItemsRelations, p);
         }

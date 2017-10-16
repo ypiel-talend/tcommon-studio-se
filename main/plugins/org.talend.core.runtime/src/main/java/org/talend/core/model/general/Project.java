@@ -400,4 +400,8 @@ public class Project {
         this.referenceProjectProvider = referenceProjectProvider;
     }
 
+    
+    public IReferenceProjectProvider getReferenceProjectProvider() {
+        return referenceProjectProvider;
+    }
 }

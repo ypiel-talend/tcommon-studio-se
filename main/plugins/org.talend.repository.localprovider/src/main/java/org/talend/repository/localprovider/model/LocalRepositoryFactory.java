@@ -3522,7 +3522,7 @@ public class LocalRepositoryFactory extends AbstractEMFRepositoryFactory impleme
         return null;
     }
 
-    public void migrateReferenceSetting(final Project project) throws PersistenceException {
+    public void migrateReferenceSetting(final Project project) throws PersistenceException, LoginException {
         // nothing to do
     }
 }

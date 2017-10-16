@@ -433,5 +433,5 @@ public interface IRepositoryFactory {
     
     public byte[] getReferenceSettingContent(Project project, String branch) throws PersistenceException;
     
-    public void migrateReferenceSetting(final Project project) throws PersistenceException;
+    public void migrateReferenceSetting(final Project project) throws PersistenceException, LoginException;
 }
