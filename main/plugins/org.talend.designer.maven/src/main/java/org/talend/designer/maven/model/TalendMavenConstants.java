@@ -115,7 +115,7 @@ public interface TalendMavenConstants {
     /**
      * argments
      */
-    static final String ARG_SKIPTESTS = "-DskipTests";
+    static final String ARG_SKIPTESTS = "-Dmaven.test.skip=true";
 
     /* same as the JavaUtils.JAVA_PROJECT_NAME */
     static final String PROJECT_NAME = ".Java";
