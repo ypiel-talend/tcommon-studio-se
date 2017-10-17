@@ -51,9 +51,9 @@ public class ReferenceProjectProvider implements IReferenceProjectProvider {
 
     private boolean hasConfigurationFile = false;
 
-    private static Map<String, List<ProjectReference>> tempReferenceMap = new HashMap<String, List<ProjectReference>>();
+    private static Map<String, List<ReferenceProjectBean>> tempReferenceMap = new HashMap<String, List<ReferenceProjectBean>>();
 
-    private static Map<String, List<ProjectReference>> tacReferenceMap = new HashMap<String, List<ProjectReference>>();
+    private static Map<String, List<ReferenceProjectBean>> tacReferenceMap = new HashMap<String, List<ReferenceProjectBean>>();
 
     public ReferenceProjectProvider(Project project) {
         this.project = project;
@@ -89,7 +89,7 @@ public class ReferenceProjectProvider implements IReferenceProjectProvider {
         return;
     }
 
-    private ProjectReference getProjectReferenceInstance(org.talend.core.model.properties.Project refProject,
+    private static ProjectReference getProjectReferenceInstance(org.talend.core.model.properties.Project refProject,
             ReferenceProjectBean bean) {
         ProjectReference pr = PropertiesFactory.eINSTANCE.createProjectReference();
         pr.setReferencedBranch(bean.getBranchName());
@@ -102,7 +102,7 @@ public class ReferenceProjectProvider implements IReferenceProjectProvider {
         if (!loadFromContent && tempReferenceMap.get(project.getTechnicalLabel()) != null) {
             return getTempReferenceList(project.getTechnicalLabel());
         }
-        if (!loadFromContent && !isHasConfigurationFile() && getTacReferenceList(project.getTechnicalLabel()) != null) {
+        if (!loadFromContent && getTacReferenceList(project.getTechnicalLabel()) != null) {
             return getTacReferenceList(project.getTechnicalLabel());
         }
         return referenceProjectList;
@@ -148,7 +148,7 @@ public class ReferenceProjectProvider implements IReferenceProjectProvider {
         }
     }
 
-    protected File getConfigurationFile() throws PersistenceException  {
+    protected File getConfigurationFile() throws PersistenceException {
         IProject iProject = ResourceUtils.getProject(project.getTechnicalLabel());
         IFolder folder = iProject.getFolder(CONFIGURATION_FOLDER_NAME);
         IFile file = folder.getFile(CONFIGURATION_FILE_NAME);
@@ -157,7 +157,7 @@ public class ReferenceProjectProvider implements IReferenceProjectProvider {
     }
 
     @Override
-    public void saveSettings() throws PersistenceException, IOException  {
+    public void saveSettings() throws PersistenceException, IOException {
         File file = getConfigurationFile();
         if (!file.getParentFile().exists()) {
             file.getParentFile().mkdirs();
@@ -182,21 +182,30 @@ public class ReferenceProjectProvider implements IReferenceProjectProvider {
     }
 
     public static void setTempReferenceList(String projectLabel, List<ProjectReference> referenceList) {
-        tempReferenceMap.put(projectLabel, referenceList);
+        List<ReferenceProjectBean> list = null;
+        if (referenceList != null) {
+            list = new ArrayList<ReferenceProjectBean>();
+            for (ProjectReference pr : referenceList) {
+                ReferenceProjectBean bean = new ReferenceProjectBean();
+                bean.setProjectTechnicalName(pr.getReferencedProject().getTechnicalLabel());
+                bean.setBranchName(pr.getReferencedBranch());
+                list.add(bean);
+            }
+        }
+        tempReferenceMap.put(projectLabel, list);
     }
 
     public static List<ProjectReference> getTempReferenceList(String projectLabel) throws PersistenceException {
-        List<ProjectReference> referenceList = tempReferenceMap.get(projectLabel);
-        if (referenceList != null) {
+        List<ReferenceProjectBean> list = tempReferenceMap.get(projectLabel);
+        if (list != null) {
             List<ProjectReference> clonedList = new ArrayList<ProjectReference>();
             IProxyRepositoryFactory proxyRepositoryFactory = CoreRuntimePlugin.getInstance().getProxyRepositoryFactory();
-            for (ProjectReference pr : referenceList) {
+            for (ReferenceProjectBean bean : list) {
                 org.talend.core.model.properties.Project refProject = proxyRepositoryFactory
-                        .getEmfProjectContent(pr.getReferencedProject().getTechnicalLabel());
+                        .getEmfProjectContent(bean.getProjectTechnicalName());
                 if (refProject != null) {
-                    pr.setReferencedProject(refProject);
+                    clonedList.add(getProjectReferenceInstance(refProject, bean));
                 }
-                clonedList.add(pr);
             }
             return clonedList;
         }
@@ -208,21 +217,30 @@ public class ReferenceProjectProvider implements IReferenceProjectProvider {
     }
 
     public static void setTacReferenceList(String projectLabel, List<ProjectReference> referenceList) {
-        tacReferenceMap.put(projectLabel, referenceList);
+        List<ReferenceProjectBean> list = null;
+        if (referenceList != null) {
+            list = new ArrayList<ReferenceProjectBean>();
+            for (ProjectReference pr : referenceList) {
+                ReferenceProjectBean bean = new ReferenceProjectBean();
+                bean.setProjectTechnicalName(pr.getReferencedProject().getTechnicalLabel());
+                bean.setBranchName(pr.getReferencedBranch());
+                list.add(bean);
+            }
+        }
+        tacReferenceMap.put(projectLabel, list);
     }
 
     public static List<ProjectReference> getTacReferenceList(String projectLabel) throws PersistenceException {
-        List<ProjectReference> referenceList = tacReferenceMap.get(projectLabel);
-        if (referenceList != null) {
+        List<ReferenceProjectBean> list = tacReferenceMap.get(projectLabel);
+        if (list != null) {
             List<ProjectReference> clonedList = new ArrayList<ProjectReference>();
             IProxyRepositoryFactory proxyRepositoryFactory = CoreRuntimePlugin.getInstance().getProxyRepositoryFactory();
-            for (ProjectReference pr : referenceList) {
+            for (ReferenceProjectBean bean : list) {
                 org.talend.core.model.properties.Project refProject = proxyRepositoryFactory
-                        .getEmfProjectContent(pr.getReferencedProject().getTechnicalLabel());
+                        .getEmfProjectContent(bean.getProjectTechnicalName());
                 if (refProject != null) {
-                    pr.setReferencedProject(refProject);
+                    clonedList.add(getProjectReferenceInstance(refProject, bean));
                 }
-                clonedList.add(pr);
             }
             return clonedList;
         }
