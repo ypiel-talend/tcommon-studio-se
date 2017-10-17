@@ -218,7 +218,7 @@ public class ReferenceProjectProvider implements IReferenceProjectProvider {
 
     public static void setTacReferenceList(String projectLabel, List<ProjectReference> referenceList) {
         List<ReferenceProjectBean> list = null;
-        if (referenceList != null) {
+        if (referenceList != null && referenceList.size() > 0) {
             list = new ArrayList<ReferenceProjectBean>();
             for (ProjectReference pr : referenceList) {
                 ReferenceProjectBean bean = new ReferenceProjectBean();
