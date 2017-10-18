@@ -12,12 +12,15 @@
 // ============================================================================
 package org.talend.designer.maven.aether;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 
 /**
  * DOC cmeng  class global comment. Detailled comment
  */
-public interface IDynamicMonitor {
+public interface IDynamicMonitor extends IProgressMonitor {
 
     public void writeMessage(String message);
+
+    public void progress(String message, int step);
 
 }
