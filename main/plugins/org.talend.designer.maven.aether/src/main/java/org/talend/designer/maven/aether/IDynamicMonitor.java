@@ -21,6 +21,4 @@ public interface IDynamicMonitor extends IProgressMonitor {
 
     public void writeMessage(String message);
 
-    public void progress(String message, int step);
-
 }

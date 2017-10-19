@@ -12,63 +12,57 @@
 // ============================================================================
 package org.talend.designer.maven.aether;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 
 /**
  * DOC cmeng  class global comment. Detailled comment
  */
-public class DummyDynamicMonitor implements IDynamicMonitor {
+public abstract class AbsDynamicProgressMonitor implements IDynamicMonitor {
 
-    @Override
-    public void writeMessage(String message) {
-        // nothing to do
+    private IProgressMonitor progressMonitor;
+
+    public AbsDynamicProgressMonitor(IProgressMonitor progressMonitor) {
+        this.progressMonitor = progressMonitor;
     }
 
     @Override
     public void beginTask(String name, int totalWork) {
-        // TODO Auto-generated method stub
-
+        progressMonitor.beginTask(name, totalWork);
     }
 
     @Override
     public void done() {
-        // TODO Auto-generated method stub
-
+        progressMonitor.done();
     }
 
     @Override
     public void internalWorked(double work) {
-        // TODO Auto-generated method stub
-
+        progressMonitor.internalWorked(work);
     }
 
     @Override
     public boolean isCanceled() {
-        // TODO Auto-generated method stub
-        return false;
+        return progressMonitor.isCanceled();
     }
 
     @Override
     public void setCanceled(boolean value) {
-        // TODO Auto-generated method stub
-
+        progressMonitor.setCanceled(value);
     }
 
     @Override
     public void setTaskName(String name) {
-        // TODO Auto-generated method stub
-
+        progressMonitor.setTaskName(name);
     }
 
     @Override
     public void subTask(String name) {
-        // TODO Auto-generated method stub
-
+        progressMonitor.subTask(name);
     }
 
     @Override
     public void worked(int work) {
-        // TODO Auto-generated method stub
-
+        progressMonitor.worked(work);
     }
 
 }

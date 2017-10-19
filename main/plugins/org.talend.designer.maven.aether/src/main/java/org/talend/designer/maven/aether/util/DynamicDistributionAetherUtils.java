@@ -52,6 +52,7 @@ import org.eclipse.aether.version.Version;
 import org.eclipse.aether.version.VersionConstraint;
 import org.eclipse.aether.version.VersionScheme;
 import org.eclipse.core.runtime.CoreException;
+import org.talend.designer.maven.aether.DummyDynamicMonitor;
 import org.talend.designer.maven.aether.IDynamicMonitor;
 import org.talend.designer.maven.aether.node.DependencyNode;
 import org.talend.designer.maven.aether.node.ExclusionNode;
@@ -69,6 +70,9 @@ public class DynamicDistributionAetherUtils {
 
     public static DependencyNode collectDepencencies(String remoteUrl, String localPath, DependencyNode dependencyNode,
             IDynamicMonitor monitor) throws Exception {
+        if (monitor == null) {
+            monitor = new DummyDynamicMonitor();
+        }
 
         String groupId = dependencyNode.getGroupId();
         String artifactId = dependencyNode.getArtifactId();
@@ -114,6 +118,7 @@ public class DynamicDistributionAetherUtils {
         collectRequest.setRoot(dependency);
         collectRequest.addRepository(central);
 
+        checkCancelOrNot(monitor);
         monitor.writeMessage("\n\n=== Start to collect dependecies of " + dependency.toString() + " ===\n");
         org.eclipse.aether.graph.DependencyNode node = repoSystem.collectDependencies(session, collectRequest).getRoot();
         if (node != null) {
@@ -132,6 +137,9 @@ public class DynamicDistributionAetherUtils {
 
     public static List<String> versionRange(String remoteUrl, String localPath, String groupId, String artifactId,
             String baseVersion, String topVersion, IDynamicMonitor monitor) throws Exception {
+        if (monitor == null) {
+            monitor = new DummyDynamicMonitor();
+        }
         RepositorySystem repSystem = newRepositorySystem();
         RepositorySystemSession repSysSession = newSession(repSystem, localPath, monitor);
 
@@ -155,6 +163,7 @@ public class DynamicDistributionAetherUtils {
         verRangeRequest.addRepository(central);
         verRangeRequest.setArtifact(artifact);
 
+        checkCancelOrNot(monitor);
         VersionRangeResult rangeResult = repSystem.resolveVersionRange(repSysSession, verRangeRequest);
         List<Version> versions = rangeResult.getVersions();
         Set<String> versionSet = new HashSet<>();
@@ -216,9 +225,11 @@ public class DynamicDistributionAetherUtils {
         LocalRepository localRepo = new LocalRepository(repositoryPath);
         session.setLocalRepositoryManager(system.newLocalRepositoryManager(session, localRepo));
 
+        DynamicExclusionDependencySelector exclusionSelector = new DynamicExclusionDependencySelector();
+        exclusionSelector.setMonitor(monitor);
         DependencySelector defaultSelector = new AndDependencySelector(
                 new DependencySelector[] { new ScopeDependencySelector(new String[] { JavaScopes.TEST, JavaScopes.PROVIDED }),
-                        new OptionalDependencySelector(), new DynamicExclusionDependencySelector() });
+                        new OptionalDependencySelector(), exclusionSelector });
         DynamicDependencySelector newSelector = new DynamicDependencySelector();
         newSelector.setProxy(defaultSelector);
         newSelector.setMonitor(monitor);
@@ -296,6 +307,14 @@ public class DynamicDistributionAetherUtils {
         }
 
         return filteredVersions;
+    }
+
+    public static void checkCancelOrNot(IDynamicMonitor monitor) throws InterruptedException {
+        if (monitor != null) {
+            if (monitor.isCanceled()) {
+                throw new InterruptedException("User canceled.");
+            }
+        }
     }
 
 }
