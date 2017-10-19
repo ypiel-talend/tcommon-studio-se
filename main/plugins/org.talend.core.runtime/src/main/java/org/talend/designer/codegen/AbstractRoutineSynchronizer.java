@@ -112,7 +112,7 @@ public abstract class AbstractRoutineSynchronizer implements ITalendSynchronizer
     }
 
     protected IFile getRoutineFile(RoutineItem routineItem) throws SystemException {
-        ITalendProcessJavaProject talendProcessJavaProject = getRunProcessService().getTalendCodeJavaProject(ERepositoryObjectType.ROUTINES);
+        ITalendProcessJavaProject talendProcessJavaProject = getRunProcessService().getTalendCodeJavaProject(ERepositoryObjectType.getItemType(routineItem));
         if (talendProcessJavaProject == null) {
             return null;
         }
@@ -252,7 +252,7 @@ public abstract class AbstractRoutineSynchronizer implements ITalendSynchronizer
     public void deleteRoutinefile(IRepositoryViewObject objToDelete) {
         Item item = objToDelete.getProperty().getItem();
         try {
-            ITalendProcessJavaProject talendProcessJavaProject = getRunProcessService().getTalendCodeJavaProject(ERepositoryObjectType.ROUTINES);
+            ITalendProcessJavaProject talendProcessJavaProject = getRunProcessService().getTalendCodeJavaProject(ERepositoryObjectType.getItemType(item));
             if (talendProcessJavaProject == null) {
                 return;
             }

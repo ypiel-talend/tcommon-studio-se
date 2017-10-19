@@ -19,6 +19,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -198,7 +199,7 @@ public interface IRunProcessService extends IService {
 
     public IFolder getJavaProjectLibFolder();
     
-    void initMavenJavaProject(Project project);
+    void initMavenJavaProject(IProgressMonitor monitor, Project project);
     
     ITalendProcessJavaProject getTalendCodeJavaProject(ERepositoryObjectType type);
 

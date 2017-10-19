@@ -1934,7 +1934,7 @@ public final class ProxyRepositoryFactory implements IProxyRepositoryFactory {
                     throw new OperationCanceledException(""); //$NON-NLS-1$
                 }
                 
-                getRunProcessService().initMavenJavaProject(project);
+                getRunProcessService().initMavenJavaProject(monitor, project);
                 
                 ICoreService coreService = getCoreService();
                 if (coreService != null) {

@@ -276,7 +276,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
             CommonExceptionHandler.process(e1);
         }
 
-        TalendJavaProjectManager.installRootPom(null);
+        TalendJavaProjectManager.installRootPom();
         
         // if (!JavaHomeUtil.isJDKSetup()) {
         // MessageDialog.openWarning(DisplayUtils.getDefaultShell(),
