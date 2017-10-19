@@ -96,6 +96,7 @@ public class DynamicDistributionAetherUtils {
             session = newSession(repoSystem, localPath, monitor);
             sessionMap.put(key, session);
         }
+        updateDependencySelector((DefaultRepositorySystemSession) session, monitor);
 
         org.eclipse.aether.graph.Dependency dependency = new org.eclipse.aether.graph.Dependency(
                 new DefaultArtifact(groupId, artifactId, classifier, null, version), scope);
@@ -112,7 +113,7 @@ public class DynamicDistributionAetherUtils {
             dependency = dependency.setExclusions(newExclusions);
         }
 
-        RemoteRepository central = new RemoteRepository.Builder("central", "default", remoteUrl).build();
+        RemoteRepository central = new RemoteRepository.Builder("central", "default", remoteUrl).build(); //$NON-NLS-1$ //$NON-NLS-2$
 
         CollectRequest collectRequest = new CollectRequest();
         collectRequest.setRoot(dependency);
@@ -142,22 +143,23 @@ public class DynamicDistributionAetherUtils {
         }
         RepositorySystem repSystem = newRepositorySystem();
         RepositorySystemSession repSysSession = newSession(repSystem, localPath, monitor);
+        updateDependencySelector((DefaultRepositorySystemSession) repSysSession, monitor);
 
         String base = baseVersion;
         if (base == null || base.isEmpty()) {
-            base = "0";
+            base = "0"; //$NON-NLS-1$
         }
-        String range = ":[" + base + ",";
+        String range = ":[" + base + ","; //$NON-NLS-1$ //$NON-NLS-2$
         if (topVersion != null && !topVersion.isEmpty()) {
             // :[0,1)
-            range = range + topVersion + ")";
+            range = range + topVersion + ")"; //$NON-NLS-1$
         } else {
             // :[0,)
-            range = range + ")";
+            range = range + ")"; //$NON-NLS-1$
         }
 
         Artifact artifact = new DefaultArtifact(groupId + ":" + artifactId + range); //$NON-NLS-1$
-        RemoteRepository central = new RemoteRepository.Builder("central", "default", remoteUrl).build();
+        RemoteRepository central = new RemoteRepository.Builder("central", "default", remoteUrl).build(); //$NON-NLS-1$ //$NON-NLS-2$
 
         VersionRangeRequest verRangeRequest = new VersionRangeRequest();
         verRangeRequest.addRepository(central);
@@ -225,6 +227,21 @@ public class DynamicDistributionAetherUtils {
         LocalRepository localRepo = new LocalRepository(repositoryPath);
         session.setLocalRepositoryManager(system.newLocalRepositoryManager(session, localRepo));
 
+        updateDependencySelector(session, monitor);
+
+        // DependencyManager defaultDependencyManager = session.getDependencyManager();
+        // DynamicDependencyManager newDependencyManager = new DynamicDependencyManager();
+        // newDependencyManager.setProxy(defaultDependencyManager);
+        // session.setDependencyManager(newDependencyManager);
+
+        return session;
+    }
+
+    private static void updateDependencySelector(DefaultRepositorySystemSession session, IDynamicMonitor monitor) {
+        session.setDependencySelector(getDependencySelector(monitor));
+    }
+
+    private static DependencySelector getDependencySelector(IDynamicMonitor monitor) {
         DynamicExclusionDependencySelector exclusionSelector = new DynamicExclusionDependencySelector();
         exclusionSelector.setMonitor(monitor);
         DependencySelector defaultSelector = new AndDependencySelector(
@@ -233,14 +250,7 @@ public class DynamicDistributionAetherUtils {
         DynamicDependencySelector newSelector = new DynamicDependencySelector();
         newSelector.setProxy(defaultSelector);
         newSelector.setMonitor(monitor);
-        session.setDependencySelector(newSelector);
-
-        // DependencyManager defaultDependencyManager = session.getDependencyManager();
-        // DynamicDependencyManager newDependencyManager = new DynamicDependencyManager();
-        // newDependencyManager.setProxy(defaultDependencyManager);
-        // session.setDependencyManager(newDependencyManager);
-
-        return session;
+        return newSelector;
     }
 
     private static Exclusion buildExclusion(ExclusionNode exclusionNode) throws Exception {
