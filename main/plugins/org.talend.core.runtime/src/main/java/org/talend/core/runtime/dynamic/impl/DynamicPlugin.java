@@ -155,7 +155,7 @@ public class DynamicPlugin extends AbstractDynamicElement implements IDynamicPlu
         }
         this.pluginConfiguration = (DynamicPluginConfiguration) pluginConfiguration;
         if (this.pluginConfiguration != null) {
-            super.addChild(this.pluginConfiguration);
+            super.addChild(0, this.pluginConfiguration);
         }
     }
 
