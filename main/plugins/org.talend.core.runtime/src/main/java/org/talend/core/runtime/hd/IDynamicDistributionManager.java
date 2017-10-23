@@ -29,6 +29,8 @@ public interface IDynamicDistributionManager {
 
     public boolean isLoaded();
 
-    public boolean isBuildinDistribution(String dynamicDistributionId);
+    public boolean isBuildinDynamicDistribution(String dynamicDistributionId);
+
+    public boolean isUsersDynamicDistribution(String dynamicDistributionId);
 
 }
