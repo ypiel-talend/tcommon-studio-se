@@ -183,6 +183,8 @@ public interface IRunProcessService extends IService {
 
     @Deprecated
     public void buildJavaProject();
+    
+    public void buildCodesJavaProject();
 
     /**
      * @deprecated use {@link IRunProcessService#getTalendJobJavaProject(Property)} instead
