@@ -105,6 +105,8 @@ public class RelationshipItemBuilder {
 
     public static final String RESOURCE_RELATION = "resource";
 
+    public static final String DYNAMIC_DISTRIBUTION_RELATION = "dynamicDistribution"; //$NON-NLS-1$
+
     /*
      * 
      */
