@@ -112,7 +112,7 @@ public class MavenPomSynchronizer {
         buildAndInstallCodesProject(pigudfsProject, runProcessService.isExportConfig());
     }
 
-    private void buildAndInstallCodesProject(ITalendProcessJavaProject codeProject, boolean isExportConfig) throws Exception {
+    public static void buildAndInstallCodesProject(ITalendProcessJavaProject codeProject, boolean isExportConfig) throws Exception {
         codeProject.buildModules(new NullProgressMonitor(), null, null);
         if (isExportConfig) {
             Map<String, Object> argumentsMap = new HashMap<>();
