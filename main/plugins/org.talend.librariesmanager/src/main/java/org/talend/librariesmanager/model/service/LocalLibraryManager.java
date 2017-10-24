@@ -628,22 +628,20 @@ public class LocalLibraryManager implements ILibraryManagerService {
         if (jarsNeeded == null || jarsNeeded.size() == 0) {
             return false;
         }
-        List<String> jarNotFound = new ArrayList<String>();
 
         boolean allIsOK = true;
+        List<ModuleNeeded> jarNotFound = new ArrayList<>();
         for (String jar : jarsNeeded) {
             ModuleNeeded moduleNeeded = null;
             if (jar != null && !jar.toUpperCase().endsWith(".JAR")) {
                 moduleNeeded = ModulesNeededProvider.getModuleNeededById(jar);
             }
-            boolean found = false;
-            if (moduleNeeded != null) {
-                found = retrieve(moduleNeeded, pathToStore, showDialog, null, monitorWrap);
-            } else {
-                found = retrieve(jar, pathToStore, false, monitorWrap);
+            if (moduleNeeded == null) {
+                moduleNeeded = new ModuleNeeded(null, jar, null, true);
             }
+            boolean found = retrieve(moduleNeeded, pathToStore, false, null, monitorWrap);
             if (!found) {
-                jarNotFound.add(jar);
+                jarNotFound.add(moduleNeeded);
                 allIsOK = false;
             }
         }
@@ -651,12 +649,12 @@ public class LocalLibraryManager implements ILibraryManagerService {
             if (GlobalServiceRegister.getDefault().isServiceRegistered(ILibraryManagerUIService.class)) {
                 ILibraryManagerUIService libUiService = (ILibraryManagerUIService) GlobalServiceRegister.getDefault().getService(
                         ILibraryManagerUIService.class);
-                libUiService.installModules(jarNotFound.toArray(new String[jarNotFound.size()]));
-                jarsNeeded = new ArrayList<String>(jarNotFound);
+                libUiService.installModules(jarNotFound);
+                List<ModuleNeeded> jarsNeededList = new ArrayList<>(jarNotFound);
                 jarNotFound.clear();
                 allIsOK = true;
                 boolean needResetModulesNeeded = false;
-                for (String jar : jarsNeeded) {
+                for (ModuleNeeded jar : jarsNeededList) {
                     if (!retrieve(jar, pathToStore, false, monitorWrap)) {
                         jarNotFound.add(jar);
                         allIsOK = false;
