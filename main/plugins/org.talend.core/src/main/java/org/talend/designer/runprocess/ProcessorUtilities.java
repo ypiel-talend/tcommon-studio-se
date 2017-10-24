@@ -651,27 +651,30 @@ public class ProcessorUtilities {
             IProcess currentProcess, String currentJobName, IProcessor processor, int option) throws ProcessorException {
         jobInfo.setProcess(null);
         jobInfo.setProcessor(null);
-        if (true/*isMainJob*/) {
-            progressMonitor.subTask(Messages.getString("ProcessorUtilities.finalizeBuild") + currentJobName); //$NON-NLS-1$
-
-            final String timeMeasureGenerateCodesId = "Generate job source codes for " //$NON-NLS-1$
-                    + (jobInfo.getJobName() != null ? jobInfo.getJobName() : jobInfo.getJobId());
-            TimeMeasure.step(timeMeasureGenerateCodesId, "Generated all source codes with children jobs (if have)");
-            if (codeModified && !BitwiseOptionUtils.containOption(option, GENERATE_WITHOUT_COMPILING)) {
-                try {
-                    processor.build(progressMonitor);
-                } catch (Exception e) {
-                    throw new ProcessorException(e);
-                }
-                TimeMeasure.step(timeMeasureGenerateCodesId, "Compile all source codes");
-                processor.syntaxCheck();
-
-                // TDI-36930, just after compile, need check the compile errors first.
+        progressMonitor.subTask(Messages.getString("ProcessorUtilities.finalizeBuild") + currentJobName); //$NON-NLS-1$
+        
+        final String timeMeasureGenerateCodesId = "Generate job source codes for " //$NON-NLS-1$
+                + (jobInfo.getJobName() != null ? jobInfo.getJobName() : jobInfo.getJobId());
+        TimeMeasure.step(timeMeasureGenerateCodesId, "Generated all source codes with children jobs (if have)");
+        if (codeModified && !BitwiseOptionUtils.containOption(option, GENERATE_WITHOUT_COMPILING)) {
+            try {
+                processor.build(progressMonitor);
+            } catch (Exception e) {
+                throw new ProcessorException(e);
+            }
+            TimeMeasure.step(timeMeasureGenerateCodesId, "Compile all source codes");
+            processor.syntaxCheck();
+            
+            // TDI-36930, just after compile, need check the compile errors first.
+            // for run/build job, check error when building every time, but for generate code, only check when main job build.
+            if (isMainJob || !BitwiseOptionUtils.containOption(option, GENERATE_MAIN_ONLY)) {
                 CorePlugin.getDefault().getRunProcessService().checkLastGenerationHasCompilationError(true);
             }
-            needContextInCurrentGeneration = true;
+        }
+        codeModified = false;
+        if (isMainJob) {
             retrievedJarsForCurrentBuild.clear();
-            codeModified = false;
+            needContextInCurrentGeneration = true;
         }
     }
 
