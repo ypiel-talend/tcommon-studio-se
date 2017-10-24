@@ -354,19 +354,21 @@ public class Project {
     }
     
     public List<ProjectReference> getProjectReferenceList() {
-        if (referenceProjectProvider == null) {
-            referenceProjectProvider = new ReferenceProjectProvider(project);
+        List<ProjectReference> projectReferenceList = new ArrayList<ProjectReference>();
+        if (!isLocal()) {
+            if (referenceProjectProvider == null) {
+                referenceProjectProvider = new ReferenceProjectProvider(project);
+                try {
+                    referenceProjectProvider.initSettings();
+                } catch (BusinessException | PersistenceException e) {
+                    ExceptionHandler.process(e);
+                }
+            }
             try {
-                referenceProjectProvider.initSettings();
-            } catch (BusinessException | PersistenceException e) {
+                projectReferenceList.addAll(referenceProjectProvider.getProjectReference());
+            } catch (PersistenceException e) {
                 ExceptionHandler.process(e);
             }
-        }
-        List<ProjectReference> projectReferenceList = new ArrayList<ProjectReference>();
-        try {
-            projectReferenceList.addAll(referenceProjectProvider.getProjectReference());
-        } catch (PersistenceException e) {
-            ExceptionHandler.process(e);
         }
         return projectReferenceList;
     }
