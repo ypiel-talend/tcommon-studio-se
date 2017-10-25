@@ -78,6 +78,8 @@ public class RelationshipItemBuilder {
 
     public static final String HADOOP_CLUSTER_RELATION = "hadoopCluster"; //$NON-NLS-1$
 
+    public static final String DB_CONNECTION_RELATION = "dbConnection"; //$NON-NLS-1$
+
     public static final String SERVICES_RELATION = "services"; //$NON-NLS-1$
 
     public static final String PROPERTY_RELATION = "property"; //$NON-NLS-1$
