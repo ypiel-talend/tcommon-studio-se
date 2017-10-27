@@ -12,9 +12,13 @@
 // ============================================================================
 package org.talend.core.hadoop;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.emf.common.util.EMap;
+import org.talend.commons.exception.ExceptionHandler;
+import org.talend.core.GlobalServiceRegister;
 import org.talend.core.model.properties.Item;
 import org.talend.core.model.properties.Property;
+import org.talend.core.runtime.hd.IDynamicDistributionManager;
 
 /**
  * created by cmeng on Jul 20, 2015 Detailled comment
@@ -34,5 +38,22 @@ public class BigDataBasicUtil {
             }
         }
         return null;
+    }
+
+    public static void reloadAllUsersDynamicDistributions(IProgressMonitor monitor) {
+        if (GlobalServiceRegister.getDefault().isServiceRegistered(IHadoopDistributionService.class)) {
+            IHadoopDistributionService hdService = (IHadoopDistributionService) GlobalServiceRegister.getDefault()
+                    .getService(IHadoopDistributionService.class);
+            if (hdService != null) {
+                IDynamicDistributionManager ddManager = hdService.getDynamicDistributionManager();
+                if (ddManager != null && ddManager.isLoaded()) {
+                    try {
+                        ddManager.reloadAllUsersDynamicDistributions(monitor);
+                    } catch (Exception e) {
+                        ExceptionHandler.process(e);
+                    }
+                }
+            }
+        }
     }
 }
