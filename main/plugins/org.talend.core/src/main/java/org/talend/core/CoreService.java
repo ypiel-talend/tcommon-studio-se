@@ -359,6 +359,8 @@ public class CoreService implements ICoreService {
             }
             URL url = MetadataTalendType.getProjectForderURLOfMappingsFile();
             if (url != null) {
+            	// set the project mappings url
+                System.setProperty("talend.mappings.url", url.toString()); //$NON-NLS-1$
                 IFolder xmlMappingFolder = talendJavaProject.getResourceSubFolder(null, JavaUtils.JAVA_XML_MAPPING);
                 
                 File mappingSource = new File(url.getPath());
@@ -387,7 +389,7 @@ public class CoreService implements ICoreService {
             ExceptionHandler.process(e);
         }
     }
-    
+
     @Override
     public void syncMappingsFileFromSystemToProject() {
         RepositoryWorkUnit workUnit = new RepositoryWorkUnit("Sync mapping files from system to project") { //$NON-NLS-1$
@@ -413,7 +415,7 @@ public class CoreService implements ICoreService {
         workUnit.setAvoidUnloadResources(true);
         ProxyRepositoryFactory.getInstance().executeRepositoryWorkUnit(workUnit);
     }
-    
+
     public String getTargetName(File file) {
         String targetName = file.getName();
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
