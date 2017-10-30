@@ -90,10 +90,12 @@ public class AggregatorPomsManager {
 
     public void createAggregatorFolderPom(IFolder folder, String folderName, String groupId, IProgressMonitor monitor)
             throws Exception {
-        IFile pomFile = folder.getFile(TalendMavenConstants.POM_FILE_NAME);
-        Model model = MavenTemplateManager.getAggregatorFolderTemplateModel(pomFile, groupId, folderName,
-                project.getTechnicalLabel());
-        PomUtil.savePom(monitor, model, pomFile);
+        if (folder != null) {
+            IFile pomFile = folder.getFile(TalendMavenConstants.POM_FILE_NAME);
+            Model model = MavenTemplateManager.getAggregatorFolderTemplateModel(pomFile, groupId, folderName,
+                    project.getTechnicalLabel());
+            PomUtil.savePom(monitor, model, pomFile);
+        }
     }
     
     public static void updatePomIfCreate(IProgressMonitor monitor, IFile pomFile, Property property) {
