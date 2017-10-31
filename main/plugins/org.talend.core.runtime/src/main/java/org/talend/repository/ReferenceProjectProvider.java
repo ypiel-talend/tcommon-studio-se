@@ -240,6 +240,9 @@ public class ReferenceProjectProvider implements IReferenceProjectProvider {
                         .getEmfProjectContent(bean.getProjectTechnicalName());
                 if (refProject != null) {
                     clonedList.add(getProjectReferenceInstance(refProject, bean));
+                } else {
+                    ReferenceProjectProblemManager.getInstance().addInvalidProjectReference(bean.getProjectTechnicalName(),
+                            bean.getBranchName());
                 }
             }
             return clonedList;
