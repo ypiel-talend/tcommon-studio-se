@@ -33,6 +33,7 @@ import org.talend.core.model.process.IContext;
 import org.talend.core.model.process.IProcess;
 import org.talend.core.model.process.IProcess2;
 import org.talend.core.model.properties.Property;
+import org.talend.core.model.properties.RoutineItem;
 import org.talend.core.model.repository.ERepositoryObjectType;
 import org.talend.core.runtime.process.ITalendProcessJavaProject;
 import org.talend.core.runtime.projectsetting.ProjectPreferenceManager;
@@ -126,6 +127,8 @@ public interface IRunProcessService extends IService {
     public void updateLibraries(Set<ModuleNeeded> jobModuleList, IProcess process, Set<ModuleNeeded> alreadyRetrievedModules)
             throws ProcessorException;
 
+    public void updateLibraries(RoutineItem routineItem);
+
     public void refreshView();
 
     public void switchToCurProcessView();
@@ -194,9 +197,9 @@ public interface IRunProcessService extends IService {
     ProjectPreferenceManager getProjectPreferenceManager();
 
     Set<String> getLibJarsForBD(IProcess process);
-    
+
     void updateProjectPomWithTemplate();
-    
+
     void storeProjectPreferences(IPreferenceStore preferenceStore);
 
     public IFolder getJavaProjectLibFolder();

@@ -82,7 +82,7 @@ public abstract class AbstractMavenCodesTemplatePom extends AbstractMavenGeneral
                 Dependency dependency = null;
                 // TDI-37032 add dependency only if jar avialable in maven
                 if (module.getDeployStatus() == ELibraryInstallStatus.DEPLOYED) {
-                    dependency = PomUtil.createModuleDependency(module.getMavenUri(true));
+                    dependency = PomUtil.createModuleDependency(module.getMavenUri());
                 }
                 if (dependency != null) {
                     existedDependencies.add(dependency);
