@@ -131,6 +131,12 @@ public final class OtherConnectionContextUtils {
         Client,
         SystemNumber,
         Language,
+        // Hana database properties
+        DbHost,
+        DbPort,
+        DbSchema,
+        DbUsername,
+        DbPassword,
     }
 
     /*
