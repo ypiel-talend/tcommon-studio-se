@@ -23,9 +23,6 @@ import org.talend.commons.ui.runtime.exception.ExceptionHandler;
 import org.talend.commons.utils.workbench.extensions.ExtensionImplementationProvider;
 import org.talend.commons.utils.workbench.extensions.ExtensionPointLimiterImpl;
 import org.talend.commons.utils.workbench.extensions.IExtensionPointLimiter;
-import org.talend.core.GlobalServiceRegister;
-import org.talend.core.ui.branding.IBrandingService;
-import org.talend.repository.model.RepositoryConstants;
 
 /**
  * Provides, using extension points, implementation of many factories.
@@ -66,6 +63,7 @@ public class RepositoryFactoryProvider {
                     for (IConfigurationElement currentLoginField : current.getChildren("loginField")) { //$NON-NLS-1$
                         DynamicFieldBean key = new DynamicFieldBean(currentLoginField.getAttribute("id"), //$NON-NLS-1$
                                 currentLoginField.getAttribute("name"), //$NON-NLS-1$
+                                currentLoginField.getAttribute("defaultValue"), //$NON-NLS-1$
                                 new Boolean(currentLoginField.getAttribute("required")), //$NON-NLS-1$
                                 new Boolean(currentLoginField.getAttribute("password"))); //$NON-NLS-1$
                         currentAction.getFields().add(key);
