@@ -129,6 +129,7 @@ import org.talend.cwm.helper.TableHelper;
 import org.talend.designer.runprocess.IRunProcessService;
 import org.talend.repository.ProjectManager;
 import org.talend.repository.ReferenceProjectProblemManager;
+import org.talend.repository.ReferenceProjectProvider;
 import org.talend.repository.RepositoryWorkUnit;
 import org.talend.repository.documentation.ERepositoryActionName;
 import org.talend.repository.model.IProxyRepositoryFactory;
@@ -1878,7 +1879,6 @@ public final class ProxyRepositoryFactory implements IProxyRepositoryFactory {
                 SubMonitor subMonitor = SubMonitor.convert(monitor, MAX_TASKS);
                 SubMonitor currentMonitor = subMonitor.newChild(1, SubMonitor.SUPPRESS_NONE);
                 currentMonitor.beginTask(Messages.getString("ProxyRepositoryFactory.logonInProgress"), 1); //$NON-NLS-1$
-                ReferenceProjectProblemManager.getInstance().clearAll();
                 project.setReferenceProjectProvider(null);
                 initEmfProjectContent();
                 getRepositoryContext().setProject(project);
@@ -1887,6 +1887,7 @@ public final class ProxyRepositoryFactory implements IProxyRepositoryFactory {
                 currentMonitor.beginTask(Messages.getString("ProxyRepositoryFactory.initializeProjectConnection"), 1); //$NON-NLS-1$
                 ProjectManager.getInstance().getBeforeLogonRecords().clear();
                 ProjectManager.getInstance().getUpdatedRemoteHandlerRecords().clear();
+                ReferenceProjectProvider.clearTacReferenceList();
                 ReferenceProjectProblemManager.getInstance().clearAll();
                 this.repositoryFactoryFromProvider.beforeLogon(project);
                 ProjectManager.getInstance().getBeforeLogonRecords().clear();
