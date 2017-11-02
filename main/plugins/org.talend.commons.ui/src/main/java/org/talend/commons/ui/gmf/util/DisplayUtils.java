@@ -125,6 +125,7 @@ public class DisplayUtils {
                         if (!display.readAndDispatch()) {
                             if (!releasedLock) {
                                 semaphore.release();
+                                releasedLock = true;
                             }
                             Thread.sleep(50);
                         }
@@ -144,6 +145,7 @@ public class DisplayUtils {
         thread.start();
 
         semaphore.acquire();
+        semaphore.release();
         Display display = Display.findDisplay(thread);
         display.syncExec(runnable);
         thread.interrupt();
