@@ -98,10 +98,10 @@ public class ReferenceProjectProvider implements IReferenceProjectProvider {
 
     @Override
     public List<ProjectReference> getProjectReference() throws PersistenceException {
-        if (!loadFromContent && getTempReferenceList(project.getTechnicalLabel()) != null) {
+        if (!loadFromContent && tempReferenceMap.get(project.getTechnicalLabel()) != null) {
             return getTempReferenceList(project.getTechnicalLabel());
         }
-        if (!loadFromContent && getTacReferenceList(project.getTechnicalLabel()) != null) {
+        if (!loadFromContent && tacReferenceMap.get(project.getTechnicalLabel()) != null) {
             return getTacReferenceList(project.getTechnicalLabel());
         }
         return referenceProjectList;
