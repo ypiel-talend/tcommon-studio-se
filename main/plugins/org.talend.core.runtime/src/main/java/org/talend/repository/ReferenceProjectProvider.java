@@ -47,7 +47,7 @@ public class ReferenceProjectProvider implements IReferenceProjectProvider {
 
     private ReferenceProjectConfiguration referenceProjectConfig;
 
-    private List<ProjectReference> referenceProjectList = new ArrayList<ProjectReference>();
+    private List<ProjectReference> referenceProjectList = null;
 
     private boolean hasConfigurationFile = false;
 
@@ -66,26 +66,28 @@ public class ReferenceProjectProvider implements IReferenceProjectProvider {
     }
 
     public void initSettings() throws BusinessException, PersistenceException {
-        if (loadFromContent || (tempReferenceMap.get(project.getTechnicalLabel()) == null
-                && tacReferenceMap.get(project.getTechnicalLabel()) == null)) {
-            IProxyRepositoryFactory proxyRepositoryFactory = CoreRuntimePlugin.getInstance().getProxyRepositoryFactory();
-            loadSettings();
-            if (referenceProjectConfig != null) {
-                for (ReferenceProjectBean bean : referenceProjectConfig.getReferenceProject()) {
-                    org.talend.core.model.properties.Project refProject = proxyRepositoryFactory
-                            .getEmfProjectContent(bean.getProjectTechnicalName());
-                    if (refProject != null) {
-                        if (!project.getTechnicalLabel().equals(refProject.getTechnicalLabel())) {
-                            referenceProjectList.add(getProjectReferenceInstance(refProject, bean));
-                        }
-                    } else {
-                        ReferenceProjectProblemManager.getInstance().addInvalidProjectReference(bean.getProjectTechnicalName(),
-                                bean.getBranchName());
-                    }
+        loadSettings();
+    }
+
+    public void loadSettings() throws PersistenceException {
+        referenceProjectList = null;
+        TypeReference<ReferenceProjectConfiguration> typeReference = new TypeReference<ReferenceProjectConfiguration>() {
+            // no need to overwrite
+        };
+
+        try {
+            if (loadFromContent) {
+                referenceProjectConfig = new ObjectMapper().readValue(configContent, typeReference);
+            } else {
+                File file = getConfigurationFile();
+                if (file != null && file.exists()) {
+                    hasConfigurationFile = true;
+                    referenceProjectConfig = new ObjectMapper().readValue(file, typeReference);
                 }
             }
+        } catch (Throwable e) {
+            throw new PersistenceException(e);
         }
-        return;
     }
 
     private static ProjectReference getProjectReferenceInstance(org.talend.core.model.properties.Project refProject,
@@ -98,11 +100,22 @@ public class ReferenceProjectProvider implements IReferenceProjectProvider {
 
     @Override
     public List<ProjectReference> getProjectReference() throws PersistenceException {
-        if (!loadFromContent && tempReferenceMap.get(project.getTechnicalLabel()) != null) {
-            return getTempReferenceList(project.getTechnicalLabel());
+        if (referenceProjectList == null) {
+            if (!loadFromContent && tempReferenceMap.get(project.getTechnicalLabel()) != null) {
+                referenceProjectList = getTempReferenceList(project.getTechnicalLabel());
+            } else if (!loadFromContent && tacReferenceMap.get(project.getTechnicalLabel()) != null) {
+                referenceProjectList = getTacReferenceList(project.getTechnicalLabel());
+            } else {
+                referenceProjectList = getSettingFileReferenceList();
+            }
         }
-        if (!loadFromContent && tacReferenceMap.get(project.getTechnicalLabel()) != null) {
-            return getTacReferenceList(project.getTechnicalLabel());
+        return referenceProjectList;
+    }
+
+    public List<ProjectReference> getSettingFileReferenceList() throws PersistenceException {
+        referenceProjectList = new ArrayList<ProjectReference>();
+        if (referenceProjectConfig != null) {
+            referenceProjectList.addAll(convert2ProjectReferenceList(referenceProjectConfig.getReferenceProject()));
         }
         return referenceProjectList;
     }
@@ -123,27 +136,6 @@ public class ReferenceProjectProvider implements IReferenceProjectProvider {
             bean.setProjectTechnicalName(projectReference.getReferencedProject().getTechnicalLabel());
             bean.setBranchName(projectReference.getReferencedBranch());
             referenceProjectConfig.getReferenceProject().add(bean);
-        }
-    }
-
-    @Override
-    public void loadSettings() throws PersistenceException {
-        TypeReference<ReferenceProjectConfiguration> typeReference = new TypeReference<ReferenceProjectConfiguration>() {
-            // no need to overwrite
-        };
-
-        try {
-            if (loadFromContent) {
-                referenceProjectConfig = new ObjectMapper().readValue(configContent, typeReference);
-            } else {
-                File file = getConfigurationFile();
-                if (file != null && file.exists()) {
-                    hasConfigurationFile = true;
-                    referenceProjectConfig = new ObjectMapper().readValue(file, typeReference);
-                }
-            }
-        } catch (Throwable e) {
-            throw new PersistenceException(e);
         }
     }
 
@@ -199,7 +191,8 @@ public class ReferenceProjectProvider implements IReferenceProjectProvider {
         return convert2ProjectReferenceList(list);
     }
 
-    public static List<ProjectReference> convert2ProjectReferenceList(List<ReferenceProjectBean> beanList) throws PersistenceException {
+    public static List<ProjectReference> convert2ProjectReferenceList(List<ReferenceProjectBean> beanList)
+            throws PersistenceException {
         if (beanList == null) {
             return null;
         }
@@ -217,7 +210,7 @@ public class ReferenceProjectProvider implements IReferenceProjectProvider {
         }
         return clonedList;
     }
-    
+
     public static void removeAllTempReferenceList() {
         tempReferenceMap.clear();
     }

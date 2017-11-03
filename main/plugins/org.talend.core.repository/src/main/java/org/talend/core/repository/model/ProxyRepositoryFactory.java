@@ -2070,6 +2070,8 @@ public final class ProxyRepositoryFactory implements IProxyRepositoryFactory {
                 root.dispose();
             }
         }
+        ReferenceProjectProvider.clearTacReferenceList();
+        ReferenceProjectProblemManager.getInstance().clearAll();
         fullLogonFinished = false;
     }
 
