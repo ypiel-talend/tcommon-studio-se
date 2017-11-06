@@ -37,6 +37,10 @@ public class PomIdsHelper {
      * always depend on current project.
      */
     public static String getProjectGroupId() {
+        return getProjectGroupId(ProjectManager.getInstance().getCurrentProject());
+    }
+
+    public static String getProjectGroupId(Project project) {
         final Project currentProject = ProjectManager.getInstance().getCurrentProject();
         if (currentProject != null) {
             String technicalLabel = currentProject.getTechnicalLabel();
@@ -58,9 +62,13 @@ public class PomIdsHelper {
      * 
      */
     public static String getProjectVersion() {
-        ProjectPreferenceManager projectPreferenceManager = DesignerMavenPlugin.getPlugin().getProjectPreferenceManager();
+        return getProjectVersion(ProjectManager.getInstance().getCurrentProject());
+    }
+    
+    public static String getProjectVersion(Project project) {
+        ProjectPreferenceManager projectPreferenceManager = new ProjectPreferenceManager(project, DesignerMavenPlugin.PLUGIN_ID);
         String projectVersion = projectPreferenceManager.getValue(MavenConstants.PROJECT_VERSION);
-        if (StringUtils.isBlank(projectVersion)){
+        if (StringUtils.isBlank(projectVersion)) {
             projectVersion = PomUtil.getDefaultMavenVersion();
         }
         boolean useSnapshot = projectPreferenceManager.getBoolean(MavenConstants.NAME_PUBLISH_AS_SNAPSHOT);

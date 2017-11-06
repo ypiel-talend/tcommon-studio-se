@@ -12,13 +12,11 @@
 // ============================================================================
 package org.talend.designer.maven.model;
 
-import org.talend.core.model.repository.ERepositoryObjectType;
-
 /**
  * DOC zwxue class global comment. Detailled comment
  */
 public class TalendJavaProjectConstants {
-    
+
     public static final String DIR_POMS = "poms"; //$NON-NLS-1$
 
     public static final String DIR_CODES = "code"; //$NON-NLS-1$
@@ -28,19 +26,19 @@ public class TalendJavaProjectConstants {
     public static final String DIR_PIGUDFS = "pigudf"; //$NON-NLS-1$
 
     public static final String DIR_BEANS = "beans"; //$NON-NLS-1$
-    
+
     public static final String DIR_JOBS = "jobs"; //$NON-NLS-1$
 
-    public static final String DIR_PROCESS = ERepositoryObjectType.PROCESS.getFolder();
+    public static final String DIR_PROCESS = "process"; //$NON-NLS-1$
 
-    public static final String DIR_PROCESS_MR = ERepositoryObjectType.PROCESS_MR.getFolder();
+    public static final String DIR_PROCESS_MR = "process_mr"; //$NON-NLS-1$
 
-    public static final String DIR_PROCESS_STORM = ERepositoryObjectType.PROCESS_STORM.getFolder();
-    
+    public static final String DIR_PROCESS_STORM = "process_storm"; //$NON-NLS-1$
+
     public static final String DIR_PROCESS_ROUTES = "routes"; //$NON-NLS-1$
-    
+
     public static final String DIR_PROCESS_SERVICES = "services"; //$NON-NLS-1$
-    
+
     public static final String CLASSPATH_FILE_NAME = ".classpath"; //$NON-NLS-1$
 
     public static final String PROJECT_FILE_NAME = ".project"; //$NON-NLS-1$

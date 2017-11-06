@@ -38,6 +38,7 @@ import org.talend.core.model.properties.Property;
 import org.talend.core.model.repository.ERepositoryObjectType;
 import org.talend.core.runtime.maven.MavenConstants;
 import org.talend.core.runtime.maven.MavenUrlHelper;
+import org.talend.core.runtime.process.TalendProcessArgumentConstant;
 import org.talend.designer.core.ICamelDesignerCoreService;
 import org.talend.designer.maven.launch.MavenPomCommandLauncher;
 import org.talend.designer.maven.model.TalendMavenConstants;
@@ -52,11 +53,11 @@ import org.talend.repository.ProjectManager;
 /**
  * DOC zwxue class global comment. Detailled comment
  */
-public class AggregatorPomsManager {
+public class AggregatorPomsHelper {
 
     private Project project;
 
-    public AggregatorPomsManager(Project project) {
+    public AggregatorPomsHelper(Project project) {
         this.project = project;
     }
 
@@ -70,16 +71,32 @@ public class AggregatorPomsManager {
         }
     }
 
-    public void installRootPom() throws Exception {
-        if (!isRootPomInstalled()) {
-            IFile pomFile = getProjectPomsFolder().getFile(TalendMavenConstants.POM_FILE_NAME);
-            new MavenPomCommandLauncher(pomFile, TalendMavenConstants.GOAL_INSTALL).execute(new NullProgressMonitor());
+    public void installRootPom(boolean current) throws Exception {
+        IFile pomFile = getProjectPomsFolder().getFile(TalendMavenConstants.POM_FILE_NAME);
+        installPom(pomFile, current);
+    }
+
+    public void installPom(IFile pomFile, boolean current) throws Exception {
+        Model model = MavenPlugin.getMaven().readModel(pomFile.getLocation().toFile());
+        if (!isPomInstalled(model.getGroupId(), model.getArtifactId(), model.getVersion())) {
+            pomFile = getProjectPomsFolder().getFile(TalendMavenConstants.POM_FILE_NAME);
+            MavenPomCommandLauncher launcher = new MavenPomCommandLauncher(pomFile, TalendMavenConstants.GOAL_INSTALL);
+            if (current) {
+                Map<String, Object> argumentsMap = new HashMap<>();
+                argumentsMap.put(TalendProcessArgumentConstant.ARG_PROGRAM_ARGUMENTS, "-N"); // $NON-NLS-N$
+                launcher.setArgumentsMap(argumentsMap);
+            }
+            launcher.execute(new NullProgressMonitor());
         }
     }
 
-    public static boolean isRootPomInstalled() {
-        String mvnUrl = MavenUrlHelper.generateMvnUrl(PomIdsHelper.getProjectGroupId(), PomIdsHelper.getProjectArtifactId(),
-                PomIdsHelper.getProjectVersion(), MavenConstants.PACKAGING_POM, null);
+    public boolean isRootPomInstalled() {
+        return isPomInstalled(PomIdsHelper.getProjectGroupId(project), PomIdsHelper.getProjectArtifactId(),
+                PomIdsHelper.getProjectVersion(project));
+    }
+
+    public boolean isPomInstalled(String groupId, String artifactId, String version) {
+        String mvnUrl = MavenUrlHelper.generateMvnUrl(groupId, artifactId, version, MavenConstants.PACKAGING_POM, null);
         return PomUtil.isAvailable(mvnUrl);
     }
 
@@ -97,7 +114,7 @@ public class AggregatorPomsManager {
             PomUtil.savePom(monitor, model, pomFile);
         }
     }
-    
+
     public static void updatePomIfCreate(IProgressMonitor monitor, IFile pomFile, Property property) {
         if (pomFile != null && pomFile.exists()) {
             Dependency dependency = null;
@@ -132,12 +149,13 @@ public class AggregatorPomsManager {
                 } catch (Exception e) {
                     ExceptionHandler.process(e);
                 }
-                
+
             }
         }
     }
-    
-    public static void updateCodeProjectPom(IProgressMonitor monitor, ERepositoryObjectType type, IFile pomFile) throws Exception {
+
+    public static void updateCodeProjectPom(IProgressMonitor monitor, ERepositoryObjectType type, IFile pomFile)
+            throws Exception {
         if (type != null) {
             if (ERepositoryObjectType.ROUTINES == type) {
                 createRoutinesPom(pomFile, monitor);

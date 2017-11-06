@@ -112,9 +112,9 @@ public class MavenPomSynchronizer {
         buildAndInstallCodesProject(pigudfsProject, runProcessService.isExportConfig());
     }
 
-    public static void buildAndInstallCodesProject(ITalendProcessJavaProject codeProject, boolean isExportConfig) throws Exception {
+    public static void buildAndInstallCodesProject(ITalendProcessJavaProject codeProject, boolean install) throws Exception {
         codeProject.buildModules(new NullProgressMonitor(), null, null);
-        if (isExportConfig) {
+        if (install) {
             Map<String, Object> argumentsMap = new HashMap<>();
             argumentsMap.put(TalendProcessArgumentConstant.ARG_GOAL, TalendMavenConstants.GOAL_INSTALL);
             argumentsMap.put(TalendProcessArgumentConstant.ARG_PROGRAM_ARGUMENTS, "-Dmaven.main.skip=true"); //$NON-NLS-1$

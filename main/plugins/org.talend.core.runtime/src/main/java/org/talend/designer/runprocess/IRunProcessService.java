@@ -35,6 +35,7 @@ import org.talend.core.model.process.IProcess2;
 import org.talend.core.model.properties.Property;
 import org.talend.core.model.properties.RoutineItem;
 import org.talend.core.model.repository.ERepositoryObjectType;
+import org.talend.core.runtime.maven.MavenArtifact;
 import org.talend.core.runtime.process.ITalendProcessJavaProject;
 import org.talend.core.runtime.projectsetting.ProjectPreferenceManager;
 
@@ -215,5 +216,7 @@ public interface IRunProcessService extends IService {
     void deleteEclipseProjects();
 
     boolean isExportConfig();
+    
+    String getAbsMavenArtifactPath(MavenArtifact artifact);
 
 }
