@@ -119,7 +119,7 @@ public class DynamicDistributionAetherUtils {
         Builder builder = new RemoteRepository.Builder("central", "default", remoteUrl); //$NON-NLS-1$ //$NON-NLS-2$
         if (StringUtils.isNotEmpty(username)) {
             Authentication auth = new AuthenticationBuilder().addUsername(username).addPassword(password).build();
-            builder.setAuthentication(auth);
+            builder = builder.setAuthentication(auth);
         }
         RemoteRepository central = builder.build();
 
@@ -170,7 +170,7 @@ public class DynamicDistributionAetherUtils {
         Builder builder = new RemoteRepository.Builder("central", "default", remoteUrl); //$NON-NLS-1$ //$NON-NLS-2$
         if (StringUtils.isNotEmpty(username)) {
             Authentication auth = new AuthenticationBuilder().addUsername(username).addPassword(password).build();
-            builder.setAuthentication(auth);
+            builder = builder.setAuthentication(auth);
         }
         RemoteRepository central = builder.build();
 
