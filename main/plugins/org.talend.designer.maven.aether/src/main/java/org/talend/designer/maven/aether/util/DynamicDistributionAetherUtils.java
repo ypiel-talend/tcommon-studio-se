@@ -35,8 +35,10 @@ import org.eclipse.aether.collection.DependencySelector;
 import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory;
 import org.eclipse.aether.graph.Exclusion;
 import org.eclipse.aether.impl.DefaultServiceLocator;
+import org.eclipse.aether.repository.Authentication;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.repository.RemoteRepository.Builder;
 import org.eclipse.aether.resolution.VersionRangeRequest;
 import org.eclipse.aether.resolution.VersionRangeResult;
 import org.eclipse.aether.spi.connector.RepositoryConnectorFactory;
@@ -47,6 +49,7 @@ import org.eclipse.aether.util.artifact.JavaScopes;
 import org.eclipse.aether.util.graph.selector.AndDependencySelector;
 import org.eclipse.aether.util.graph.selector.OptionalDependencySelector;
 import org.eclipse.aether.util.graph.selector.ScopeDependencySelector;
+import org.eclipse.aether.util.repository.AuthenticationBuilder;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.Version;
 import org.eclipse.aether.version.VersionConstraint;
@@ -68,8 +71,8 @@ public class DynamicDistributionAetherUtils {
 
     private static Map<String, RepositorySystemSession> sessionMap = new HashMap<>();
 
-    public static DependencyNode collectDepencencies(String remoteUrl, String localPath, DependencyNode dependencyNode,
-            IDynamicMonitor monitor) throws Exception {
+    public static DependencyNode collectDepencencies(String remoteUrl, String username, String password, String localPath,
+            DependencyNode dependencyNode, IDynamicMonitor monitor) throws Exception {
         if (monitor == null) {
             monitor = new DummyDynamicMonitor();
         }
@@ -113,7 +116,12 @@ public class DynamicDistributionAetherUtils {
             dependency = dependency.setExclusions(newExclusions);
         }
 
-        RemoteRepository central = new RemoteRepository.Builder("central", "default", remoteUrl).build(); //$NON-NLS-1$ //$NON-NLS-2$
+        Builder builder = new RemoteRepository.Builder("central", "default", remoteUrl); //$NON-NLS-1$ //$NON-NLS-2$
+        if (StringUtils.isNotEmpty(username)) {
+            Authentication auth = new AuthenticationBuilder().addUsername(username).addPassword(password).build();
+            builder.setAuthentication(auth);
+        }
+        RemoteRepository central = builder.build();
 
         CollectRequest collectRequest = new CollectRequest();
         collectRequest.setRoot(dependency);
@@ -136,8 +144,8 @@ public class DynamicDistributionAetherUtils {
 
     }
 
-    public static List<String> versionRange(String remoteUrl, String localPath, String groupId, String artifactId,
-            String baseVersion, String topVersion, IDynamicMonitor monitor) throws Exception {
+    public static List<String> versionRange(String remoteUrl, String username, String password, String localPath, String groupId,
+            String artifactId, String baseVersion, String topVersion, IDynamicMonitor monitor) throws Exception {
         if (monitor == null) {
             monitor = new DummyDynamicMonitor();
         }
@@ -159,7 +167,12 @@ public class DynamicDistributionAetherUtils {
         }
 
         Artifact artifact = new DefaultArtifact(groupId + ":" + artifactId + range); //$NON-NLS-1$
-        RemoteRepository central = new RemoteRepository.Builder("central", "default", remoteUrl).build(); //$NON-NLS-1$ //$NON-NLS-2$
+        Builder builder = new RemoteRepository.Builder("central", "default", remoteUrl); //$NON-NLS-1$ //$NON-NLS-2$
+        if (StringUtils.isNotEmpty(username)) {
+            Authentication auth = new AuthenticationBuilder().addUsername(username).addPassword(password).build();
+            builder.setAuthentication(auth);
+        }
+        RemoteRepository central = builder.build();
 
         VersionRangeRequest verRangeRequest = new VersionRangeRequest();
         verRangeRequest.addRepository(central);

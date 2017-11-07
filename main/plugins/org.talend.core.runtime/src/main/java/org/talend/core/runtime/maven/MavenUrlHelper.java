@@ -12,6 +12,10 @@
 // ============================================================================
 package org.talend.core.runtime.maven;
 
+import java.net.URI;
+import java.net.URL;
+import java.net.URLDecoder;
+
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.talend.commons.exception.ExceptionHandler;
@@ -38,6 +42,10 @@ public class MavenUrlHelper {
 
     public static final String VERSION_SNAPSHOT = "SNAPSHOT";
 
+    public static final String USER_PASSWORD_SEPARATOR = "@";
+
+    public static final String USER_PASSWORD_SPLITER = ":";
+
     public static MavenArtifact parseMvnUrl(String mvnUrl) {
         return parseMvnUrl(mvnUrl, true);
     }
@@ -52,9 +60,38 @@ public class MavenUrlHelper {
             String substring = mvnUrl.substring(MVN_PROTOCOL.length());
 
             // repo
-            int repoUrlIndex = substring.indexOf(REPO_SEPERATOR);
+            int repoUrlIndex = substring.lastIndexOf(REPO_SEPERATOR);
             if (repoUrlIndex > 0) { // has repo url
-                artifact.setRepositoryUrl(substring.substring(0, repoUrlIndex));
+                String repoWithUserPwd = substring.substring(0, repoUrlIndex);
+                String repoUrl = repoWithUserPwd;
+                try {
+                    URI repoWithUserPwdURI = new URI(repoWithUserPwd);
+                    String userPassword = repoWithUserPwdURI.getUserInfo();
+                    URI repoWithoutUserPwdURI = new URI(repoWithUserPwdURI.getScheme(), null, repoWithUserPwdURI.getHost(),
+                            repoWithUserPwdURI.getPort(), repoWithUserPwdURI.getPath(), repoWithUserPwdURI.getQuery(),
+                            repoWithUserPwdURI.getFragment());
+                    repoUrl = repoWithoutUserPwdURI.toString();
+                    try {
+                        repoUrl = URLDecoder.decode(repoUrl, "UTF-8");
+                    } catch (Exception e) {
+                        // nothing to do
+                    }
+
+                    // username and password
+                    if (StringUtils.isNotEmpty(userPassword)) {
+                        int splitIndex = userPassword.indexOf(USER_PASSWORD_SPLITER);
+                        if (0 < splitIndex) {
+                            artifact.setUsername(userPassword.substring(0, splitIndex));
+                            if (splitIndex < userPassword.length() - 1) {
+                                artifact.setPassword(userPassword.substring(splitIndex + 1));
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    ExceptionHandler.process(e);
+                }
+
+                artifact.setRepositoryUrl(repoUrl);
                 substring = substring.substring(repoUrlIndex + 1);
             }
             String[] segments = substring.split(SEPERATOR);
@@ -179,6 +216,11 @@ public class MavenUrlHelper {
 
     public static String generateMvnUrl(String repositoryId, String groupId, String artifactId, String version, String packaging,
             String classifier) {
+        return generateMvnUrl(null, null, repositoryId, groupId, artifactId, version, packaging, classifier);
+    }
+
+    public static String generateMvnUrl(String username, String password, String repositoryId, String groupId, String artifactId,
+            String version, String packaging, String classifier) {
         Assert.isNotNull(groupId);
         Assert.isNotNull(artifactId);
 
@@ -186,7 +228,27 @@ public class MavenUrlHelper {
         mvnUrl.append(MVN_PROTOCOL);
 
         if (StringUtils.isNotEmpty(repositoryId)) {
-            mvnUrl.append(repositoryId).append(REPO_SEPERATOR);
+            String repositoryUrl = repositoryId;
+            if (StringUtils.isNotEmpty(username)) {
+                String usernamePassword = username + USER_PASSWORD_SPLITER + password;
+                try {
+                    URL repoWithoutUserPasswordUrl = new URL(repositoryId);
+                    if (repoWithoutUserPasswordUrl != null) {
+                        if (StringUtils.isEmpty(repoWithoutUserPasswordUrl.getHost())) {
+                            throw new Exception("Bad url, can't resolve it: " + repositoryId);
+                        } else {
+                            URI repoWithUserPasswordURI = new URI(repoWithoutUserPasswordUrl.getProtocol(), usernamePassword,
+                                    repoWithoutUserPasswordUrl.getHost(), repoWithoutUserPasswordUrl.getPort(),
+                                    repoWithoutUserPasswordUrl.getPath(), repoWithoutUserPasswordUrl.getQuery(),
+                                    repoWithoutUserPasswordUrl.getRef());
+                            repositoryUrl = repoWithUserPasswordURI.toString();
+                        }
+                    }
+                } catch (Exception e) {
+                    ExceptionHandler.process(e);
+                }
+            }
+            mvnUrl.append(repositoryUrl).append(REPO_SEPERATOR);
         }
 
         mvnUrl.append(groupId);

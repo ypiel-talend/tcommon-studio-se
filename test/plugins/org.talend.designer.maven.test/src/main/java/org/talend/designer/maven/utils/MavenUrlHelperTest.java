@@ -256,4 +256,40 @@ public class MavenUrlHelperTest {
         mvnURIWithType = MavenUrlHelper.addTypeForMavenUri(mvnURI, moduleName);
         Assert.assertEquals(mvnURIWithType, "mvn:org.talend.libraries/abc/6.0.0-SNAPSHOT/zip");
     }
+
+    @Test
+    public void testUserPasswordForMavenUri() {
+        final String group = "group";
+        final String artifact = "artifact";
+        final String version = "7.0";
+        final String repository = "http://localhost:8080/nexus";
+        final String username = "user";
+        final String password = "p@s:wo!d";
+
+        String url = MavenUrlHelper.generateMvnUrl(username, password, repository, group, artifact, version, null, null);
+
+        Assert.assertEquals("mvn:http://user:p%40s:wo!d@localhost:8080/nexus!group/artifact/7.0", url);
+
+        MavenArtifact ma = MavenUrlHelper.parseMvnUrl(url);
+
+        Assert.assertEquals(repository, ma.getRepositoryUrl());
+        Assert.assertEquals(username, ma.getUsername());
+        Assert.assertEquals(password, ma.getPassword());
+        Assert.assertEquals(group, ma.getGroupId());
+        Assert.assertEquals(artifact, ma.getArtifactId());
+        Assert.assertEquals(version, ma.getVersion());
+
+        final String repository2 = "http://user2:password2@localhost:8080/nexus";
+        url = MavenUrlHelper.generateMvnUrl(username, password, repository2, group, artifact, version, null, null);
+        Assert.assertEquals("mvn:http://user:p%40s:wo!d@localhost:8080/nexus!group/artifact/7.0", url);
+
+        ma = MavenUrlHelper.parseMvnUrl(url);
+
+        Assert.assertEquals(repository, ma.getRepositoryUrl());
+        Assert.assertEquals(username, ma.getUsername());
+        Assert.assertEquals(password, ma.getPassword());
+        Assert.assertEquals(group, ma.getGroupId());
+        Assert.assertEquals(artifact, ma.getArtifactId());
+        Assert.assertEquals(version, ma.getVersion());
+    }
 }

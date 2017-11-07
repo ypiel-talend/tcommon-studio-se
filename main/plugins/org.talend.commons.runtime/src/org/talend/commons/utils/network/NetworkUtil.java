@@ -12,17 +12,11 @@
 // ============================================================================
 package org.talend.commons.utils.network;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.net.Authenticator;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -77,6 +71,25 @@ public class NetworkUtil {
             e.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * encode url
+     * 
+     * @param urlStr url not encoded yet
+     * @return
+     * @throws Exception
+     */
+    public static URL encodeUrl(String urlStr) throws Exception {
+        try {
+            // String decodedURL = URLDecoder.decode(urlStr, "UTF-8"); //$NON-NLS-1$
+            URL url = new URL(urlStr);
+            URI uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(),
+                    url.getRef());
+            return uri.toURL();
+        } catch (Exception e) {
+            throw e;
+        }
     }
 
 }
