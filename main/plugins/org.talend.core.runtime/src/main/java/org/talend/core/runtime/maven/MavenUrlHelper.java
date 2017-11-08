@@ -216,6 +216,11 @@ public class MavenUrlHelper {
         return generateMvnUrlForJarName(jarName, true, true);
     }
 
+    public static String generateMvnUrl(MavenArtifact mArt, boolean encryptPassword) {
+        return generateMvnUrl(mArt.getUsername(), mArt.getPassword(), mArt.getRepositoryUrl(), mArt.getGroupId(),
+                mArt.getArtifactId(), mArt.getVersion(), mArt.getType(), mArt.getClassifier(), encryptPassword);
+    }
+
     /**
      * 
      * mvn:groupId/artifactId/version/packaging/classifier
@@ -226,11 +231,11 @@ public class MavenUrlHelper {
 
     public static String generateMvnUrl(String repositoryId, String groupId, String artifactId, String version, String packaging,
             String classifier) {
-        return generateMvnUrl(null, null, repositoryId, groupId, artifactId, version, packaging, classifier);
+        return generateMvnUrl(null, null, repositoryId, groupId, artifactId, version, packaging, classifier, true);
     }
 
     public static String generateMvnUrl(String username, String password, String repositoryId, String groupId, String artifactId,
-            String version, String packaging, String classifier) {
+            String version, String packaging, String classifier, boolean encryptPassword) {
         Assert.isNotNull(groupId);
         Assert.isNotNull(artifactId);
 
@@ -243,7 +248,9 @@ public class MavenUrlHelper {
                 if (password == null) {
                     password = "";
                 }
-                password = encryptPassword(password);
+                if (encryptPassword) {
+                    password = encryptPassword(password);
+                }
                 String usernamePassword = username + USER_PASSWORD_SPLITER + password;
                 try {
                     URL repoWithoutUserPasswordUrl = new URL(repositoryId);

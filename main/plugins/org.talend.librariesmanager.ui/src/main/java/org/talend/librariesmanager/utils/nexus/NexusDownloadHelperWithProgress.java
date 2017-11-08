@@ -64,12 +64,16 @@ public class NexusDownloadHelperWithProgress extends DownloadHelperWithProgress 
                     customNexusServer.setUserName(username);
                     customNexusServer.setPassword(password);
                 }
-                String mvnUriWithoutPassword = MavenUrlHelper.generateMvnUrl(mArtifact.getRepositoryUrl(), mArtifact.getGroupId(),
-                        mArtifact.getArtifactId(), mArtifact.getVersion(), mArtifact.getType(), mArtifact.getClassifier());
-                progressMonitor.subTask("Downloading " + toInstall.getName() + ": " + mvnUriWithoutPassword);
+                String resolvedMvnUri = MavenUrlHelper.generateMvnUrl(mArtifact.getGroupId(), mArtifact.getArtifactId(),
+                        mArtifact.getVersion(), mArtifact.getType(), mArtifact.getClassifier());
+                progressMonitor.subTask(
+                        "Downloading " + toInstall.getName() + ": " + resolvedMvnUri + " from " + customNexusServer.getServer());
                 ILibraryManagerService libManager = (ILibraryManagerService) GlobalServiceRegister.getDefault().getService(
                         ILibraryManagerService.class);
-                resolved = libManager.resolveJar(customNexusServer, mvnUri);
+                // seems the customNexusServer is not used in resolveJar function, so still need to provide
+                // user/password in the mvn uri
+                String decryptedMvnUri = MavenUrlHelper.generateMvnUrl(mArtifact, false);
+                resolved = libManager.resolveJar(customNexusServer, decryptedMvnUri);
                 if (resolved != null && resolved.exists()) {
                     return;
                 }

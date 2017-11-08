@@ -269,7 +269,7 @@ public class MavenUrlHelperTest {
                 + MavenUrlHelper.USER_PASSWORD_SEPARATOR + "localhost:8080/nexus" + MavenUrlHelper.REPO_SEPERATOR + group
                 + MavenUrlHelper.SEPERATOR + artifact + MavenUrlHelper.SEPERATOR + version;
 
-        String url = MavenUrlHelper.generateMvnUrl(username, password, repository, group, artifact, version, null, null);
+        String url = MavenUrlHelper.generateMvnUrl(username, password, repository, group, artifact, version, null, null, true);
 
         Assert.assertEquals(mvnUrl, url);
 
@@ -283,7 +283,7 @@ public class MavenUrlHelperTest {
         Assert.assertEquals(version, ma.getVersion());
 
         final String repository2 = "http://user2:password2@localhost:8080/nexus";
-        url = MavenUrlHelper.generateMvnUrl(username, password, repository2, group, artifact, version, null, null);
+        url = MavenUrlHelper.generateMvnUrl(username, password, repository2, group, artifact, version, null, null, true);
         Assert.assertEquals(mvnUrl, url);
 
         ma = MavenUrlHelper.parseMvnUrl(url);
