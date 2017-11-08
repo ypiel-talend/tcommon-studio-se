@@ -55,10 +55,18 @@ public class NexusDownloadHelperWithProgress extends DownloadHelperWithProgress 
         if (mArtifact != null) {
             String repositoryUrl = mArtifact.getRepositoryUrl();
             if (StringUtils.isNotEmpty(repositoryUrl)) {
-                TalendLibsServerManager manager = TalendLibsServerManager.getInstance();
+                // TalendLibsServerManager manager = TalendLibsServerManager.getInstance();
                 final NexusServerBean customNexusServer = new NexusServerBean(false);
                 customNexusServer.setServer(repositoryUrl);
-                progressMonitor.subTask("Downloading " + toInstall.getName() + ": " + mvnUri + " from " + repositoryUrl);
+                String username = mArtifact.getUsername();
+                String password = mArtifact.getPassword();
+                if (StringUtils.isNotEmpty(username)) {
+                    customNexusServer.setUserName(username);
+                    customNexusServer.setPassword(password);
+                }
+                String mvnUriWithoutPassword = MavenUrlHelper.generateMvnUrl(mArtifact.getRepositoryUrl(), mArtifact.getGroupId(),
+                        mArtifact.getArtifactId(), mArtifact.getVersion(), mArtifact.getType(), mArtifact.getClassifier());
+                progressMonitor.subTask("Downloading " + toInstall.getName() + ": " + mvnUriWithoutPassword);
                 ILibraryManagerService libManager = (ILibraryManagerService) GlobalServiceRegister.getDefault().getService(
                         ILibraryManagerService.class);
                 resolved = libManager.resolveJar(customNexusServer, mvnUri);

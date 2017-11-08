@@ -19,6 +19,7 @@ import java.net.URLDecoder;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.talend.commons.exception.ExceptionHandler;
+import org.talend.utils.security.CryptoHelper;
 
 /**
  * DOC ggu class global comment. Detailled comment
@@ -45,6 +46,8 @@ public class MavenUrlHelper {
     public static final String USER_PASSWORD_SEPARATOR = "@";
 
     public static final String USER_PASSWORD_SPLITER = ":";
+
+    private static CryptoHelper cryptoHelper;
 
     public static MavenArtifact parseMvnUrl(String mvnUrl) {
         return parseMvnUrl(mvnUrl, true);
@@ -83,7 +86,14 @@ public class MavenUrlHelper {
                         if (0 < splitIndex) {
                             artifact.setUsername(userPassword.substring(0, splitIndex));
                             if (splitIndex < userPassword.length() - 1) {
-                                artifact.setPassword(userPassword.substring(splitIndex + 1));
+                                String password = userPassword.substring(splitIndex + 1);
+                                if (password != null) {
+                                    String decryptedPassword = decryptPassword(password);
+                                    if (decryptedPassword != null) {
+                                        password = decryptedPassword;
+                                    }
+                                }
+                                artifact.setPassword(password);
                             }
                         }
                     }
@@ -230,6 +240,10 @@ public class MavenUrlHelper {
         if (StringUtils.isNotEmpty(repositoryId)) {
             String repositoryUrl = repositoryId;
             if (StringUtils.isNotEmpty(username)) {
+                if (password == null) {
+                    password = "";
+                }
+                password = encryptPassword(password);
                 String usernamePassword = username + USER_PASSWORD_SPLITER + password;
                 try {
                     URL repoWithoutUserPasswordUrl = new URL(repositoryId);
@@ -295,6 +309,21 @@ public class MavenUrlHelper {
                     parseMvnUrl.getType(), parseMvnUrl.getClassifier());
         }
         return uri;
+    }
+
+    private static CryptoHelper getCryptoHelper() {
+        if (cryptoHelper == null) {
+            cryptoHelper = CryptoHelper.getDefault();
+        }
+        return cryptoHelper;
+    }
+
+    public static String encryptPassword(String password) {
+        return getCryptoHelper().encrypt(password);
+    }
+
+    public static String decryptPassword(String password) {
+        return getCryptoHelper().decrypt(password);
     }
 
 }
