@@ -40,7 +40,7 @@ public class BigDataBasicUtil {
         return null;
     }
 
-    public static void reloadAllUsersDynamicDistributions(IProgressMonitor monitor) {
+    public static void reloadAllDynamicDistributions(IProgressMonitor monitor) {
         if (GlobalServiceRegister.getDefault().isServiceRegistered(IHadoopDistributionService.class)) {
             IHadoopDistributionService hdService = (IHadoopDistributionService) GlobalServiceRegister.getDefault()
                     .getService(IHadoopDistributionService.class);
@@ -48,7 +48,7 @@ public class BigDataBasicUtil {
                 IDynamicDistributionManager ddManager = hdService.getDynamicDistributionManager();
                 if (ddManager != null && ddManager.isLoaded()) {
                     try {
-                        ddManager.reloadAllUsersDynamicDistributions(monitor);
+                        ddManager.reloadAllDynamicDistributions(monitor);
                     } catch (Exception e) {
                         ExceptionHandler.process(e);
                     }

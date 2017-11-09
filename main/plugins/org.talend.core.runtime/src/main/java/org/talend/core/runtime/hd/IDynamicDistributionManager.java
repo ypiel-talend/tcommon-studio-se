@@ -25,7 +25,7 @@ public interface IDynamicDistributionManager {
 
     public String getUserStoragePath();
 
-    public void reloadAllUsersDynamicDistributions(IProgressMonitor monitor) throws Exception;
+    public void reloadAllDynamicDistributions(IProgressMonitor monitor) throws Exception;
 
     public boolean isLoaded();
 
