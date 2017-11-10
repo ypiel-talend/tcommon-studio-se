@@ -216,6 +216,13 @@ public class MavenUrlHelper {
         return generateMvnUrlForJarName(jarName, true, true);
     }
 
+    /**
+     * normally just encrpyt the password except tring to download
+     * 
+     * @param mArt
+     * @param encryptPassword
+     * @return
+     */
     public static String generateMvnUrl(MavenArtifact mArt, boolean encryptPassword) {
         return generateMvnUrl(mArt.getUsername(), mArt.getPassword(), mArt.getRepositoryUrl(), mArt.getGroupId(),
                 mArt.getArtifactId(), mArt.getVersion(), mArt.getType(), mArt.getClassifier(), encryptPassword);
@@ -312,8 +319,7 @@ public class MavenUrlHelper {
                 // set jar by default
                 parseMvnUrl.setType(MavenConstants.TYPE_JAR);
             }
-            uri = MavenUrlHelper.generateMvnUrl(parseMvnUrl.getGroupId(), parseMvnUrl.getArtifactId(), parseMvnUrl.getVersion(),
-                    parseMvnUrl.getType(), parseMvnUrl.getClassifier());
+            uri = MavenUrlHelper.generateMvnUrl(parseMvnUrl, true);
         }
         return uri;
     }
@@ -331,6 +337,14 @@ public class MavenUrlHelper {
 
     public static String decryptPassword(String password) {
         return getCryptoHelper().decrypt(password);
+    }
+
+    public static String generateModuleNameByMavenURI(String uri) {
+        MavenArtifact parseMvnUrl = MavenUrlHelper.parseMvnUrl(uri, true);
+        if (parseMvnUrl == null) {
+            return null;
+        }
+        return parseMvnUrl.getFileName();
     }
 
 }

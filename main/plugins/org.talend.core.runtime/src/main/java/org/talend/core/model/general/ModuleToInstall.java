@@ -18,7 +18,6 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.talend.commons.exception.ExceptionHandler;
 import org.talend.core.runtime.maven.MavenArtifact;
-import org.talend.core.runtime.maven.MavenConstants;
 import org.talend.core.runtime.maven.MavenUrlHelper;
 
 /**
@@ -159,17 +158,6 @@ public class ModuleToInstall {
      */
     public void setDistribution(String distribution) {
         this.distribution = distribution;
-    }
-
-    public void resolveDistribution(String artifactType) {
-        String distribution = MavenConstants.DOWNLOAD_MANUAL;
-        if (artifactType == null || "".equals(artifactType) //$NON-NLS-1$
-                || MavenConstants.PACKAGING_POM.equals(artifactType)) {
-            distribution = MavenConstants.DOWNLOAD_MANUAL;
-        } else {
-            distribution = artifactType;
-        }
-        setDistribution(distribution);
     }
 
     @Override
