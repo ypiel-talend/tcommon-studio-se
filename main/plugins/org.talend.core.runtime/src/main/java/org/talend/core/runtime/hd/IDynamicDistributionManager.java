@@ -12,6 +12,8 @@
 // ============================================================================
 package org.talend.core.runtime.hd;
 
+import java.util.Collection;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 
 /**
@@ -24,6 +26,8 @@ public interface IDynamicDistributionManager {
     public static final String DISTRIBUTION_FILE_EXTENSION = "json"; //$NON-NLS-1$
 
     public String getUserStoragePath();
+
+    public Collection<String> getPreferencePaths();
 
     public void reloadAllDynamicDistributions(IProgressMonitor monitor) throws Exception;
 
