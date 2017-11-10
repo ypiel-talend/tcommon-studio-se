@@ -34,7 +34,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * DOC cmeng  class global comment. Detailled comment
+ * DOC cmeng class global comment. Detailled comment
  */
 public class DynamicServiceUtil {
 
@@ -43,8 +43,7 @@ public class DynamicServiceUtil {
         return (ServiceRegistration<T>) context.registerService(clazzes, service, properties);
     }
 
-    public static <T> void unregistOSGiService(ServiceRegistration<T> serviceRegistration)
-            throws Exception {
+    public static <T> void unregistOSGiService(ServiceRegistration<T> serviceRegistration) throws Exception {
         serviceRegistration.unregister();
     }
 
@@ -96,7 +95,7 @@ public class DynamicServiceUtil {
      * @param plugin
      * @return
      */
-    public static boolean removeContribution(IDynamicPlugin plugin) {
+    public static boolean removeContribution(IDynamicPlugin plugin) throws Exception {
         boolean succeed = true;
 
         List<IDynamicExtension> extensions = plugin.getAllExtensions();
@@ -116,14 +115,17 @@ public class DynamicServiceUtil {
         return succeed;
     }
 
-    public static boolean removeExtension(String extensionPointId, String extensionId) {
+    public static boolean removeExtension(String extensionPointId, String extensionId) throws Exception {
         IExtensionRegistry extensionRegistry = RegistryFactory.getRegistry();
         Object userToken = ((ExtensionRegistry) extensionRegistry).getTemporaryUserToken();
         return removeExtension(extensionRegistry, userToken, extensionPointId, extensionId);
     }
 
     public static boolean removeExtension(IExtensionRegistry extensionRegistry, Object userToken, String extensionPointId,
-            String extensionId) {
+            String extensionId) throws Exception {
+        if (!extensionId.contains(".")) { //$NON-NLS-1$
+            throw new Exception("Extenison point id MUST contain one DOT, otherwise can't remove successfully!");
+        }
         IExtension extension = extensionRegistry.getExtension(extensionPointId, extensionId);
         if (extension != null) {
             return extensionRegistry.removeExtension(extension, userToken);
