@@ -203,7 +203,10 @@ public abstract class AbstractMavenProcessorPom extends CreateMavenBundleTemplat
                     if (!validChildrenJob(jobInfo)) {
                         continue;
                     }
-                    String groupId = model.getGroupId();
+                    Property property = jobInfo.getProcessItem().getProperty();
+                    String subjobProjectTechName = ProjectManager.getInstance().getProject(property).getTechnicalLabel();
+                    org.talend.core.model.general.Project project = ProjectManager.getInstance().getProjectFromProjectTechLabel(subjobProjectTechName);
+                    String groupId = PomIdsHelper.getProjectGroupId(project);
                     String artifactId = PomIdsHelper.getJobArtifactId(jobInfo);
                     String version = PomIdsHelper.getJobVersion(jobInfo.getProcessItem().getProperty());
 

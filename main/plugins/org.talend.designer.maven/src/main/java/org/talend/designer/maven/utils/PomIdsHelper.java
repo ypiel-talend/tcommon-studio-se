@@ -41,9 +41,8 @@ public class PomIdsHelper {
     }
 
     public static String getProjectGroupId(Project project) {
-        final Project currentProject = ProjectManager.getInstance().getCurrentProject();
-        if (currentProject != null) {
-            String technicalLabel = currentProject.getTechnicalLabel();
+        if (project != null) {
+            String technicalLabel = project.getTechnicalLabel();
             return JavaResourcesHelper.getGroupName(TalendMavenConstants.DEFAULT_MASTER + '.' + technicalLabel);
         }
         return JavaResourcesHelper.getGroupName(TalendMavenConstants.DEFAULT_MASTER);
