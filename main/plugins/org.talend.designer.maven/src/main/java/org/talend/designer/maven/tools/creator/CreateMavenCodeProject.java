@@ -75,7 +75,7 @@ public class CreateMavenCodeProject extends AbstractMavenGeneralTemplatePom {
     private IProject project;
 
     private IFile pomFile;
-    
+
     private IPath location;
 
     public CreateMavenCodeProject(IProject project) {
@@ -97,6 +97,7 @@ public class CreateMavenCodeProject extends AbstractMavenGeneralTemplatePom {
         templateModel.setArtifactId("talend"); //$NON-NLS-1$
         templateModel.setVersion(PomIdsHelper.getProjectVersion());
         templateModel.setPackaging(TalendMavenConstants.PACKAGING_JAR);
+        PomUtil.checkParent(templateModel, pomFile, null);
         return templateModel;
     }
 
@@ -112,7 +113,7 @@ public class CreateMavenCodeProject extends AbstractMavenGeneralTemplatePom {
     public void setProjectLocation(IPath location) {
         this.location = location;
     }
-    
+
     public void setPomFile(IFile pomFile) {
         this.pomFile = pomFile;
     }
@@ -151,7 +152,7 @@ public class CreateMavenCodeProject extends AbstractMavenGeneralTemplatePom {
             p.open(monitor);
         }
         addTalendNature(p, TalendJobNature.ID, monitor);
-        //convertJavaProjectToPom(monitor, p);
+        // convertJavaProjectToPom(monitor, p);
         PomUtil.addToParentModules(pomFile);
         changeClasspath(monitor, p);
 
@@ -168,13 +169,13 @@ public class CreateMavenCodeProject extends AbstractMavenGeneralTemplatePom {
             pMoniter = new NullProgressMonitor();
         }
         IProgressMonitor subMonitor = new SubProgressMonitor(pMoniter, 100);
-        
+
         Model model;
-//        if (pomFile.exists()) {
-//            model = MavenPlugin.getMavenModelManager().readMavenModel(pomFile);
-//        } else {
-//            // first time create, use temp model.
-//        }
+        // if (pomFile.exists()) {
+        // model = MavenPlugin.getMavenModelManager().readMavenModel(pomFile);
+        // } else {
+        // // first time create, use temp model.
+        // }
         // always use temp model to avoid classpath problem?
         model = createModel();
 
@@ -188,7 +189,7 @@ public class CreateMavenCodeProject extends AbstractMavenGeneralTemplatePom {
         // MavenPlugin.getProjectConversionManager().convert(project, model, subMonitor);
 
         subMonitor.worked(80);
-        
+
         afterCreate(subMonitor, p);
 
         subMonitor.done();
@@ -208,7 +209,7 @@ public class CreateMavenCodeProject extends AbstractMavenGeneralTemplatePom {
         }
     }
 
-    //TODO remove?
+    // TODO remove?
     private void convertJavaProjectToPom(IProgressMonitor monitor, IProject p) {
         IFile pomFile = p.getFile(TalendMavenConstants.POM_FILE_NAME);
         if (pomFile.exists()) {
@@ -290,9 +291,9 @@ public class CreateMavenCodeProject extends AbstractMavenGeneralTemplatePom {
                 IFolder output = p.getFolder("target/classes");
                 ClasspathAttribute attribute = new ClasspathAttribute("maven.pomderived", Boolean.TRUE.toString());
                 IClasspathEntry newEntry = JavaCore.newSourceEntry(resources.getFullPath(), new IPath[0], new IPath[0],
-                        output.getFullPath(), new IClasspathAttribute[]{attribute});
+                        output.getFullPath(), new IClasspathAttribute[] { attribute });
                 list.add(1, newEntry);
-                rawClasspathEntries = list.toArray(new IClasspathEntry[]{});
+                rawClasspathEntries = list.toArray(new IClasspathEntry[] {});
                 changed = true;
             }
             if (changed) {
@@ -388,7 +389,8 @@ public class CreateMavenCodeProject extends AbstractMavenGeneralTemplatePom {
     }
 
     @SuppressWarnings("restriction")
-    private void createSimpleProject(IProgressMonitor monitor, IProject p, Model model, ProjectImportConfiguration importConfiguration) throws CoreException {
+    private void createSimpleProject(IProgressMonitor monitor, IProject p, Model model,
+            ProjectImportConfiguration importConfiguration) throws CoreException {
         final String[] directories = getFolders();
 
         ProjectConfigurationManager projectConfigurationManager = (ProjectConfigurationManager) MavenPlugin
@@ -407,11 +409,10 @@ public class CreateMavenCodeProject extends AbstractMavenGeneralTemplatePom {
         hideNestedProjectsFromParents(Collections.singletonList(p));
 
         monitor.worked(1);
-        
+
         monitor.subTask(Messages.ProjectConfigurationManager_task_creating_pom);
         IFile pomFile = p.getFile(TalendMavenConstants.POM_FILE_NAME);
         if (!pomFile.exists()) {
-            // TODO surround by workunit.
             MavenPlugin.getMavenModelManager().createMavenModel(pomFile, model);
         }
         monitor.worked(1);
@@ -425,7 +426,7 @@ public class CreateMavenCodeProject extends AbstractMavenGeneralTemplatePom {
         monitor.subTask(Messages.ProjectConfigurationManager_task_creating_project);
         projectConfigurationManager.enableMavenNature(p, importConfiguration.getResolverConfiguration(), monitor);
         monitor.worked(1);
-        
+
         if (this.pomFile == null) {
             this.pomFile = pomFile;
         }
