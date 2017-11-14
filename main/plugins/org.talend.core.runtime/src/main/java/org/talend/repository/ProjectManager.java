@@ -905,7 +905,7 @@ public final class ProjectManager {
         return list;
     } 
 
-	public static void clearProjectId() {
+	public static void clearCachedProjectIds() {
 		projectLabelToIdMap.clear();
 	}
 
@@ -913,7 +913,7 @@ public final class ProjectManager {
 		projectLabelToIdMap.put(projectLabel, projectId);
 	}
 
-	public static String getProjectId(String projectLabel) {
+	public static String getCachedProjectId(String projectLabel) {
 		if (projectLabelToIdMap.get(projectLabel) != null) {
 			return String.valueOf(projectLabelToIdMap.get(projectLabel));
 		}
