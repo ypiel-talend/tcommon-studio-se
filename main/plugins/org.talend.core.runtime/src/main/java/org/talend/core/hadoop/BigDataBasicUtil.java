@@ -29,7 +29,10 @@ import org.talend.core.runtime.hd.IDynamicDistributionManager;
  */
 public class BigDataBasicUtil {
 
-    private static Collection<String> dynamicDistributionPaths;
+    /**
+     * DON'T use cache here!
+     */
+    // private static Collection<String> dynamicDistributionPaths;
 
     public static Object getFramework(Item item) {
         if (item == null) {
@@ -63,24 +66,24 @@ public class BigDataBasicUtil {
     }
 
     public static Collection<String> getDynamicDistributionPaths() {
-        if (dynamicDistributionPaths == null || dynamicDistributionPaths.isEmpty()) {
-            dynamicDistributionPaths = new HashSet<>();
-            IDynamicDistributionManager ddManager = null;
-            if (GlobalServiceRegister.getDefault().isServiceRegistered(IHadoopDistributionService.class)) {
-                IHadoopDistributionService hdService = (IHadoopDistributionService) GlobalServiceRegister.getDefault()
-                        .getService(IHadoopDistributionService.class);
-                if (hdService != null) {
-                    ddManager = hdService.getDynamicDistributionManager();
-                    if (ddManager != null) {
-                        String dynamicDistrPath = ddManager.getUserStoragePath();
-                        dynamicDistributionPaths.add(dynamicDistrPath);
-                        Collection<String> preferencePaths = ddManager.getPreferencePaths();
-                        dynamicDistributionPaths.addAll(preferencePaths);
-                    }
+        // if (dynamicDistributionPaths == null || dynamicDistributionPaths.isEmpty()) {
+        Collection<String> dynamicDistributionPaths = new HashSet<>();
+        IDynamicDistributionManager ddManager = null;
+        if (GlobalServiceRegister.getDefault().isServiceRegistered(IHadoopDistributionService.class)) {
+            IHadoopDistributionService hdService = (IHadoopDistributionService) GlobalServiceRegister.getDefault()
+                    .getService(IHadoopDistributionService.class);
+            if (hdService != null) {
+                ddManager = hdService.getDynamicDistributionManager();
+                if (ddManager != null) {
+                    String dynamicDistrPath = ddManager.getUserStoragePath();
+                    dynamicDistributionPaths.add(dynamicDistrPath);
+                    Collection<String> preferencePaths = ddManager.getPreferencePaths();
+                    dynamicDistributionPaths.addAll(preferencePaths);
                 }
-
             }
+
         }
+        // }
         return dynamicDistributionPaths;
     }
 
