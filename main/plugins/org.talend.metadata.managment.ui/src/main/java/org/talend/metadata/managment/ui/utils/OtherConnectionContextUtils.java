@@ -121,7 +121,7 @@ public final class OtherConnectionContextUtils {
         Encoding,
         // These constants seems to be used by deprecated code
         // Added temporary to avoid studio build failure
-        MDMURL,     
+        MDMURL,
         UNIVERSE,
         DATACLUSTER,
         DATAMODEL,
@@ -533,7 +533,8 @@ public final class OtherConnectionContextUtils {
         ConnectionContextHelper.createParameters(varList, paramName, conn.getUsername());
 
         paramName = prefixName + EParamName.MDM_Password;
-        ConnectionContextHelper.createParameters(varList, paramName, conn.getValue(conn.getPassword(), false), JavaTypesManager.PASSWORD);
+        ConnectionContextHelper.createParameters(varList, paramName, conn.getValue(conn.getPassword(), false),
+                JavaTypesManager.PASSWORD);
 
         paramName = prefixName + EParamName.MDM_URL;
         ConnectionContextHelper.createParameters(varList, paramName, conn.getServerUrl());
@@ -689,7 +690,8 @@ public final class OtherConnectionContextUtils {
         setSAPConnectionAdditionPropertiesForContextMode(sapConn);
     }
 
-    static void setSAPConnnectionBasicPropertiesForContextMode(SAPConnection sapConn, EParamName sapParam, String sapBasicVarName) {
+    static void setSAPConnnectionBasicPropertiesForContextMode(SAPConnection sapConn, EParamName sapParam,
+            String sapBasicVarName) {
         switch (sapParam) {
         case Client:
             sapConn.setClient(ContextParameterUtils.getNewScriptCode(sapBasicVarName, LANGUAGE));
@@ -746,12 +748,13 @@ public final class OtherConnectionContextUtils {
         String host = TalendQuoteUtils.removeQuotes(ConnectionContextHelper.getOriginalValue(contextType, conn.getHost()));
         String userName = TalendQuoteUtils
                 .removeQuotes(ConnectionContextHelper.getOriginalValue(contextType, conn.getUsername()));
-        String passWord = TalendQuoteUtils.removeQuotes(ConnectionContextHelper.getOriginalValue(contextType,
-                conn.getValue(conn.getPassword(), false)));
-        String systemNumber = TalendQuoteUtils.removeQuotes(ConnectionContextHelper.getOriginalValue(contextType,
-                conn.getSystemNumber()));
+        String passWord = TalendQuoteUtils
+                .removeQuotes(ConnectionContextHelper.getOriginalValue(contextType, conn.getValue(conn.getPassword(), false)));
+        String systemNumber = TalendQuoteUtils
+                .removeQuotes(ConnectionContextHelper.getOriginalValue(contextType, conn.getSystemNumber()));
         String language = TalendQuoteUtils
                 .removeQuotes(ConnectionContextHelper.getOriginalValue(contextType, conn.getLanguage()));
+        conn.setContextMode(false);
         conn.setClient(client);
         conn.setHost(host);
         conn.setUsername(userName);
@@ -760,8 +763,8 @@ public final class OtherConnectionContextUtils {
         conn.setLanguage(language);
 
         for (AdditionalConnectionProperty sapProperty : conn.getAdditionalProperties()) {
-            String contextPropertyValue = TalendQuoteUtils.removeQuotes(ConnectionContextHelper.getOriginalValue(contextType,
-                    sapProperty.getValue()));
+            String contextPropertyValue = TalendQuoteUtils
+                    .removeQuotes(ConnectionContextHelper.getOriginalValue(contextType, sapProperty.getValue()));
             sapProperty.setValue(contextPropertyValue);
         }
         // Hana database properties
@@ -773,14 +776,13 @@ public final class OtherConnectionContextUtils {
                 ConnectionContextHelper.getOriginalValue(contextType, TaggedValueHelper.getValueString(PROP_DB_SCHEMA, conn)));
         String dbUsername = TalendQuoteUtils.removeQuotes(
                 ConnectionContextHelper.getOriginalValue(contextType, TaggedValueHelper.getValueString(PROP_DB_USERNAME, conn)));
-        String dbPassword = TalendQuoteUtils.removeQuotes(
-                ConnectionContextHelper.getOriginalValue(contextType,
-                        conn.getValue(TaggedValueHelper.getValueString(PROP_DB_PASSWORD, conn), false)));
+        String dbPassword = TalendQuoteUtils.removeQuotes(ConnectionContextHelper.getOriginalValue(contextType,
+                conn.getValue(TaggedValueHelper.getValueString(PROP_DB_PASSWORD, conn), false)));
         TaggedValueHelper.setTaggedValue(conn, PROP_DB_HOST, dbHost);
         TaggedValueHelper.setTaggedValue(conn, PROP_DB_PORT, dbPort);
         TaggedValueHelper.setTaggedValue(conn, PROP_DB_SCHEMA, dbSchema);
         TaggedValueHelper.setTaggedValue(conn, PROP_DB_USERNAME, dbUsername);
-        TaggedValueHelper.setTaggedValue(conn, PROP_DB_PASSWORD, dbPassword);
+        TaggedValueHelper.setTaggedValue(conn, PROP_DB_PASSWORD, conn.getValue(dbPassword, true));
     }
 
     public static SAPConnection cloneOriginalValueSAPConnection(SAPConnection fileConn, ContextType contextType) {
@@ -878,7 +880,8 @@ public final class OtherConnectionContextUtils {
         }
     }
 
-    static void setMDMConnnectionBasicPropertiesForContextMode(MDMConnection mdmConn, EParamName mdmParam, String mdmBasicVarName) {
+    static void setMDMConnnectionBasicPropertiesForContextMode(MDMConnection mdmConn, EParamName mdmParam,
+            String mdmBasicVarName) {
         switch (mdmParam) {
         case MDM_URL:
             mdmConn.setServerUrl(ContextParameterUtils.getNewScriptCode(mdmBasicVarName, LANGUAGE));
@@ -897,9 +900,12 @@ public final class OtherConnectionContextUtils {
         if (conn == null || contextType == null) {
             return;
         }
-        String username = TalendQuoteUtils.removeQuotes(ConnectionContextHelper.getOriginalValue(contextType, conn.getUsername()));
-        String password = TalendQuoteUtils.removeQuotes(ConnectionContextHelper.getOriginalValue(contextType, conn.getPassword()));       
-        String serverUrl = TalendQuoteUtils.removeQuotes(ConnectionContextHelper.getOriginalValue(contextType, conn.getServerUrl()));
+        String username = TalendQuoteUtils
+                .removeQuotes(ConnectionContextHelper.getOriginalValue(contextType, conn.getUsername()));
+        String password = TalendQuoteUtils
+                .removeQuotes(ConnectionContextHelper.getOriginalValue(contextType, conn.getPassword()));
+        String serverUrl = TalendQuoteUtils
+                .removeQuotes(ConnectionContextHelper.getOriginalValue(contextType, conn.getServerUrl()));
 
         conn.setUsername(username);
         conn.setPassword(password);
@@ -1643,7 +1649,8 @@ public final class OtherConnectionContextUtils {
 
     }
 
-    public static SAPConnection getOriginalValueConnection(SAPConnection connection, String contextString, boolean defaultContext) {
+    public static SAPConnection getOriginalValueConnection(SAPConnection connection, String contextString,
+            boolean defaultContext) {
         if (connection.isContextMode()) {
             ContextType contextType = ConnectionContextHelper.getContextTypeForContextMode(connection, contextString,
                     defaultContext);
