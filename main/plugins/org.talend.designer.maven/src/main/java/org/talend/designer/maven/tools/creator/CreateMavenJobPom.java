@@ -537,15 +537,6 @@ public class CreateMavenJobPom extends AbstractMavenProcessorPom {
     protected void generateAssemblyFile(IProgressMonitor monitor, final Set<JobInfo> clonedChildrenJobInfors) throws Exception {
         IFile assemblyFile = this.getAssemblyFile();
         if (assemblyFile != null) {
-
-            // TODO remove
-            try {
-                checkCreatingFile(monitor, assemblyFile);
-            } catch (Exception e) {
-                ExceptionHandler.process(e);
-                return;
-            }
-
             boolean set = false;
             // read template from project setting
             try {

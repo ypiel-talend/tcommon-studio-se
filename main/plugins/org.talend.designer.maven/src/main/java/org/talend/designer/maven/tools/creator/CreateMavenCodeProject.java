@@ -61,6 +61,7 @@ import org.talend.designer.maven.model.MavenSystemFolders;
 import org.talend.designer.maven.model.ProjectSystemFolder;
 import org.talend.designer.maven.model.TalendMavenConstants;
 import org.talend.designer.maven.template.MavenTemplateManager;
+import org.talend.designer.maven.tools.AggregatorPomsHelper;
 import org.talend.designer.maven.utils.PomIdsHelper;
 import org.talend.designer.maven.utils.PomUtil;
 
@@ -153,7 +154,7 @@ public class CreateMavenCodeProject extends AbstractMavenGeneralTemplatePom {
         }
         addTalendNature(p, TalendJobNature.ID, monitor);
         // convertJavaProjectToPom(monitor, p);
-        PomUtil.addToParentModules(pomFile);
+        AggregatorPomsHelper.addToParentModules(pomFile);
         changeClasspath(monitor, p);
 
         IJavaProject javaProject = JavaCore.create(p);
@@ -192,9 +193,11 @@ public class CreateMavenCodeProject extends AbstractMavenGeneralTemplatePom {
 
         afterCreate(subMonitor, p);
 
-        subMonitor.done();
+        executeRepositoryWorkUnit();
 
         project = p;
+
+        subMonitor.done();
     }
 
     public static void addTalendNature(IProject project, String natureId, IProgressMonitor monitor) throws CoreException {

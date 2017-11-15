@@ -23,9 +23,12 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.talend.commons.exception.ExceptionHandler;
 import org.talend.commons.utils.io.FilesUtils;
+import org.talend.core.GlobalServiceRegister;
 import org.talend.core.PluginChecker;
 import org.talend.designer.maven.template.MavenTemplateManager;
 import org.talend.designer.maven.utils.PomUtil;
+import org.talend.repository.RepositoryWorkUnit;
+import org.talend.repository.model.IRepositoryService;
 
 /**
  * created by ggu on 2 Feb 2015 Detailled comment
@@ -161,6 +164,8 @@ public class CreateMavenBundleTemplatePom extends CreateMaven {
         PomUtil.savePom(monitor, model, curPomFile);
 
         afterCreate(monitor);
+
+        executeRepositoryWorkUnit();
     }
 
     protected void checkCreatingFile(IProgressMonitor monitor, IFile currentFile) throws Exception {
@@ -169,6 +174,22 @@ public class CreateMavenBundleTemplatePom extends CreateMaven {
 
     protected void afterCreate(IProgressMonitor monitor) throws Exception {
         // nothing to do
+    }
+    
+    protected void executeRepositoryWorkUnit() {
+        RepositoryWorkUnit workUnit = new RepositoryWorkUnit<Object>("Creat/update pom/assembly/templates in job/code project") { //$NON-NLS-1$
+
+            @Override
+            protected void run() {
+                // do nothing.
+            }
+        };
+        workUnit.setAvoidUnloadResources(true);
+        workUnit.setFilesModifiedOutsideOfRWU(true);
+        if (GlobalServiceRegister.getDefault().isServiceRegistered(IRepositoryService.class)) {
+            IRepositoryService repositoryService = (IRepositoryService) GlobalServiceRegister.getDefault().getService(IRepositoryService.class);
+            repositoryService.getProxyRepositoryFactory().executeRepositoryWorkUnit(workUnit);
+        }
     }
 
 }

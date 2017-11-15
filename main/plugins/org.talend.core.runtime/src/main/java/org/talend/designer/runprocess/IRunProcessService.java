@@ -187,7 +187,7 @@ public interface IRunProcessService extends IService {
 
     @Deprecated
     public void buildJavaProject();
-    
+
     public void buildCodesJavaProject();
 
     /**
@@ -204,19 +204,27 @@ public interface IRunProcessService extends IService {
     void storeProjectPreferences(IPreferenceStore preferenceStore);
 
     public IFolder getJavaProjectLibFolder();
-    
+
     void initMavenJavaProject(IProgressMonitor monitor, Project project);
-    
+
     ITalendProcessJavaProject getTalendCodeJavaProject(ERepositoryObjectType type);
 
     ITalendProcessJavaProject getTalendJobJavaProject(Property property);
-    
+
+    ITalendProcessJavaProject getExistingTalendJobJavaProjectById(String id);
+
+    void deleteTalendJobJavaProject(Property property);
+
     ITalendProcessJavaProject getTempJavaProject();
-    
+
     void deleteEclipseProjects();
 
     boolean isExportConfig();
-    
+
     String getAbsMavenArtifactPath(MavenArtifact artifact);
+
+    void removeFromAggregatorPomModule(Property property);
+    
+    void addToAggregatorPomModule(Property property);
 
 }

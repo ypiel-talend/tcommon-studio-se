@@ -119,7 +119,6 @@ import org.talend.core.repository.recyclebin.RecycleBinManager;
 import org.talend.core.repository.utils.RepositoryPathProvider;
 import org.talend.core.repository.utils.XmiResourceManager;
 import org.talend.core.runtime.CoreRuntimePlugin;
-import org.talend.core.runtime.process.ITalendProcessJavaProject;
 import org.talend.core.runtime.services.IMavenUIService;
 import org.talend.core.runtime.util.JavaHomeUtil;
 import org.talend.core.service.ICoreUIService;
@@ -719,6 +718,8 @@ public final class ProxyRepositoryFactory implements IProxyRepositoryFactory {
             checkAvailability(object);
         }
         this.repositoryFactoryFromProvider.deleteObjectLogical(project, object);
+        
+        getRunProcessService().removeFromAggregatorPomModule(objToDelete.getProperty());
         // unlock(objToDelete);
         // i18n
         // log.debug("Logical deletion [" + objToDelete + "] by " + getRepositoryContext().getUser() + ".");

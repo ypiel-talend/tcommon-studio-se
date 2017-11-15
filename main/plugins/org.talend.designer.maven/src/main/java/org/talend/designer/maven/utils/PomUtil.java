@@ -12,11 +12,16 @@
 // ============================================================================
 package org.talend.designer.maven.utils;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -104,11 +109,49 @@ public class PomUtil {
         MavenPlugin.getMaven().writeModel(model, buf);
 
         ByteArrayInputStream source = new ByteArrayInputStream(buf.toByteArray());
-        // TODO should surround by workunit
         if (pomFile.exists()) {
             pomFile.setContents(source, true, false, monitor);
         } else {
             pomFile.create(source, true, monitor);
+        }
+    }
+
+    public static void savePom(IProgressMonitor monitor, Model model, File pomFile) throws Exception {
+        if (monitor == null) {
+            monitor = new NullProgressMonitor();
+        }
+        if (pomFile == null) {
+            throw new NullPointerException("the output file is null.");
+        }
+        
+        ByteArrayOutputStream buf = new ByteArrayOutputStream();
+        MavenPlugin.getMaven().writeModel(model, buf);
+        
+        ByteArrayInputStream source = new ByteArrayInputStream(buf.toByteArray());
+        BufferedWriter bw = new BufferedWriter(new FileWriter(pomFile, false));
+        
+        BufferedReader br = new BufferedReader(new InputStreamReader(source));
+        if (!pomFile.exists()) {
+            pomFile.createNewFile();
+        }
+        try {
+            String line = null;
+            while ((line = br.readLine()) != null) {
+                bw.write(line);
+                bw.newLine();
+            }
+        } finally {
+            safeClose(br);
+            safeClose(bw);
+        }
+    }
+
+    private static void safeClose(Closeable stream) {
+        try {
+            if (stream != null)
+                stream.close();
+        } catch (IOException e) {
+            //ignore
         }
     }
 
@@ -720,56 +763,6 @@ public class PomUtil {
                 } catch (IOException e) {
                     ExceptionHandler.process(e);
                 }
-            }
-        }
-    }
-
-    public static void addToParentModules(IFile pomFile) throws Exception {
-        if (pomFile == null || pomFile.getParent() == null || pomFile.getParent().getParent() == null) {
-            return;
-        }
-        if (pomFile.getParent().getName().equals(TalendMavenConstants.PROJECT_NAME)) {
-            // ignore .Java project
-            return;
-        }
-        IContainer container = pomFile.getParent().getParent();
-        if (container instanceof IFolder) {
-            IFolder folder = (IFolder) container;
-            IFile parentPom = folder.getFile(TalendMavenConstants.POM_FILE_NAME);
-            if (parentPom.exists()) {
-                IPath relativePath = pomFile.getFullPath().makeRelativeTo(folder.getFullPath());
-                Model model = MODEL_MANAGER.readMavenModel(parentPom);
-                List<String> modules = model.getModules();
-                if (modules == null) {
-                    modules = new ArrayList<>();
-                    model.setModules(modules);
-                }
-                if (!modules.contains(relativePath.toPortableString())) {
-                    modules.add(relativePath.toPortableString());
-                    savePom(null, model, parentPom);
-                }
-            }
-        }
-    }
-
-    public static void removeFromParentModules(IFile pomFile) throws Exception {
-        if (pomFile == null || pomFile.getParent() == null || pomFile.getParent().getParent() == null) {
-            return;
-        }
-        if (pomFile.getParent().getName().equals(TalendMavenConstants.PROJECT_NAME)) {
-            // ignore .Java project
-            return;
-        }
-        IContainer container = pomFile.getParent().getParent();
-        if (container instanceof IFolder) {
-            IFolder folder = (IFolder) container;
-            IFile parentPom = folder.getFile(TalendMavenConstants.POM_FILE_NAME);
-            IPath relativePath = pomFile.getFullPath().makeRelativeTo(folder.getFullPath());
-            Model model = MODEL_MANAGER.readMavenModel(parentPom);
-            List<String> modules = model.getModules();
-            if (modules != null && modules.contains(relativePath.toPortableString())) {
-                modules.remove(relativePath.toPortableString());
-                savePom(null, model, parentPom);
             }
         }
     }

@@ -487,31 +487,6 @@ public class PomUtilTest {
     }
 
     @Test
-    public void testAddToAndRemoveFromParentModules() throws Exception {
-        String projectTechName = ProjectManager.getInstance().getCurrentProject().getTechnicalLabel();
-        IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-        IFolder pomsFolder = root.getFolder(new Path(projectTechName + "/" + TalendJavaProjectConstants.DIR_POMS));
-        IFolder jobFolder = pomsFolder.getFolder("jobs").getFolder("process").getFolder("item_job1");
-        if (!jobFolder.exists()) {
-            jobFolder.create(true, true, null);
-        }
-        IFile jobPom = jobFolder.getFile("pom.xml");
-        PomUtil.addToParentModules(jobPom);
-
-        IFile processPom = pomsFolder.getFolder("jobs").getFolder("process").getFile("pom.xml");
-        Model model = MavenPlugin.getMavenModelManager().readMavenModel(processPom);
-        assertNotNull(model.getModules());
-        assertTrue(model.getModules().contains("item_job1/pom.xml"));
-
-        PomUtil.removeFromParentModules(jobPom);
-
-        model = MavenPlugin.getMavenModelManager().readMavenModel(processPom);
-        assertNotNull(model.getModules());
-        assertFalse(model.getModules().contains("item_job1/pom.xml"));
-    }
-
-
-    @Test
     public void testGetArtifactPath() {
         MavenArtifact artifact = new MavenArtifact();
         artifact.setGroupId("org.talend.libraries");
