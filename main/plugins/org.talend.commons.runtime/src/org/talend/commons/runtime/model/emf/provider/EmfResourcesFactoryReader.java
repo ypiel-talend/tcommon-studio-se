@@ -149,6 +149,10 @@ public class EmfResourcesFactoryReader extends ExtensionRegistryReader {
         return saveOptionsProviders;
     }
 
+    public boolean existedSaveOption(ResourceOption option) {
+        return getSaveOptionsProviders().containsKey(option.getName());
+    }
+
     public Map<String, OptionProvider> getLoadOptionsProviders() {
         return loadOptionsProviders;
     }

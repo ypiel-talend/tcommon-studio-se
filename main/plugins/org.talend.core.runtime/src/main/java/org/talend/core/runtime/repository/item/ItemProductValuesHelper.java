@@ -40,6 +40,15 @@ public final class ItemProductValuesHelper {
         return DATEFORMAT.format(new Date());
     }
 
+    public static boolean existed(Property property) {
+        if (property == null) {
+            return false;
+        }
+        EMap additionalProperties = property.getAdditionalProperties();
+        return additionalProperties.containsKey(ItemProductKeys.FULLNAME.getModifiedKey())
+                || additionalProperties.containsKey(ItemProductKeys.FULLNAME.getCreatedKey());
+    }
+
     public static boolean setValuesWhenCreate(Property property, Date date) {
         if (property == null) {
             return false;
@@ -95,20 +104,30 @@ public final class ItemProductValuesHelper {
             return false;
         }
         Project project = ProjectManager.getInstance().getProject(property);
-        if (project == null) {
+        if (project == null) { // use current project instead
             project = ProjectManager.getInstance().getCurrentProject().getEmfProject();
         }
+        return setValuesWhenMigrate(property, project);
+    }
+
+    public static boolean setValuesWhenMigrate(Property property, Project project) {
+        if (property == null) {
+            return false;
+        }
+
+        if (project == null) { // use current project instead
+            project = ProjectManager.getInstance().getCurrentProject().getEmfProject();
+        }
+
         EMap additionalProperties = property.getAdditionalProperties();
 
         String productStr = project.getProductVersion();
         Map<String, String> productValues = parseProduct(productStr);
-
-        String fullname = productStr; // use the whole value
-        String version = null;
-        if (!productValues.isEmpty()) {
-            fullname = productValues.keySet().iterator().next();
-            version = productValues.get(fullname);
+        if (productValues.isEmpty()) {
+            return false;
         }
+        String fullname = productValues.keySet().iterator().next();
+        String version = productValues.get(fullname);
 
         String curDateTime = getCurDateTime();
         //
@@ -143,27 +162,34 @@ public final class ItemProductValuesHelper {
         EMap additionalProperties = property.getAdditionalProperties();
         String productVersion = project.getProductVersion();
         Map<String, String> productValues = parseProduct(productVersion);
-        if (!productValues.isEmpty()) {
-            String fullname = productValues.keySet().iterator().next();
-            String version = productValues.get(fullname);
-
-            additionalProperties.put(ItemProductKeys.FULLNAME.getImportKey(), fullname);
-            additionalProperties.put(ItemProductKeys.VERSION.getImportKey(), version);
-            additionalProperties.put(ItemProductKeys.DATE.getImportKey(), getCurDateTime());
-            return true;
+        if (productValues.isEmpty()) {
+            return false;
         }
-        return false;
+        String fullname = productValues.keySet().iterator().next();
+        String version = productValues.get(fullname);
+
+        additionalProperties.put(ItemProductKeys.FULLNAME.getImportKey(), fullname);
+        additionalProperties.put(ItemProductKeys.VERSION.getImportKey(), version);
+        additionalProperties.put(ItemProductKeys.DATE.getImportKey(), getCurDateTime());
+
+        // also migrate other keys first, because in migration task, only for current project
+        setValuesWhenMigrate(property, project);
+
+        return true;
     }
 
-    static Map<String, String> parseProduct(String str) {
+    static Map<String, String> parseProduct(String value) {
         Map<String, String> result = new HashMap<String, String>();
-        int sepIndex = str.indexOf('-');
+        int sepIndex = value.indexOf('-');
         if (sepIndex > 0) {
-            String fullname = str.substring(0, sepIndex);
-            String version = str.substring(sepIndex + 1);
+            String fullname = value.substring(0, sepIndex);
+            String version = value.substring(sepIndex + 1);
             if (version.length() > 0) {
                 result.put(fullname, version);
             }
+        }
+        if (result.isEmpty()) { // if invalid, set the full name for whole string without version
+            result.put(value, null);
         }
         return result;
 

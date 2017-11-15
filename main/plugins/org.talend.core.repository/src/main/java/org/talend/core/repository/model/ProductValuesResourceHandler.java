@@ -18,12 +18,10 @@ import java.util.Map;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.xmi.XMLResource;
-import org.talend.commons.runtime.model.emf.provider.CreateOptionProvider;
-import org.talend.commons.runtime.model.emf.provider.OptionProvider;
 import org.talend.commons.runtime.model.emf.provider.ResourceHandler;
+import org.talend.commons.runtime.model.emf.provider.ResourceOption;
 import org.talend.core.model.properties.PropertiesPackage;
 import org.talend.core.model.properties.Property;
-import org.talend.core.runtime.repository.item.ItemProductKeys;
 import org.talend.core.runtime.repository.item.ItemProductValuesHelper;
 
 /**
@@ -31,47 +29,42 @@ import org.talend.core.runtime.repository.item.ItemProductValuesHelper;
  */
 public class ProductValuesResourceHandler extends ResourceHandler {
 
-    public static final OptionProvider migrationOption = new OptionProvider() {
-
-        @Override
-        public String getName() {
-            return "option_migration";
-        }
-
-        @Override
-        public Object getValue() {
-            return Boolean.TRUE;
-        }
-
-    };
-
     @Override
     public void preSave(Object resource, OutputStream outputStream, Map<?, ?> options) {
         if (resource instanceof XMLResource) {
             final Property prop = (Property) EcoreUtil.getObjectByType(((XMLResource) resource).getContents(),
                     PropertiesPackage.eINSTANCE.getProperty());
             if (prop != null) {
+                /*
+                 * need ignore, when:
+                 * 
+                 * 1) import, will do create also, and created and modified keys will be set in migration task. and set
+                 * the import date in ImportResourcesHandler. Else, if existed already nothing to do.
+                 * 
+                 * 2) migrate with 2 cases, when import, will do point 1. when logon, just do migration task
+                 */
+                if (options.containsKey(ResourceOption.ITEM_IMPORTATION.getName())
+                        || options.containsKey(ResourceOption.DEMO_IMPORTATION.getName())
+                        || options.containsKey(ResourceOption.MIGRATION.getName())) {
+                    return;
+                }
+
                 Date saveDate = new Date();
-                if (options.containsKey(CreateOptionProvider.CREATE)) {
+                if (options.containsKey(ResourceOption.CREATATION.getName())) {
                     ItemProductValuesHelper.setValuesWhenCreate(prop, saveDate);
                 }
 
-                // if migration, nothing to do, becuase it have been processed in migration task
-                if (!options.containsKey(migrationOption.getName())) {
-
-                    if (prop.getAdditionalProperties().containsKey(ItemProductKeys.FULLNAME.getModifiedKey())
-                            || prop.getAdditionalProperties().containsKey(ItemProductKeys.FULLNAME.getCreatedKey())) {
-                        // if existed, just do update
-                        ItemProductValuesHelper.setValuesWhenModify(prop, saveDate);
-                    } else {// no any keys, do migration too.
-                            // currently, especially when copy/paste items, won't do migration task in first logon
-                        ItemProductValuesHelper.setValuesWhenMigrate(prop);
-                    }
-
-                    // always remove the date
-                    prop.setCreationDate(null);
-                    prop.setModificationDate(null);
+                if (ItemProductValuesHelper.existed(prop)) {
+                    // if existed, just do update
+                    ItemProductValuesHelper.setValuesWhenModify(prop, saveDate);
+                } else {// no any keys, do migration too.
+                        // currently, especially when copy/paste items, won't do migration task in first logon
+                    ItemProductValuesHelper.setValuesWhenMigrate(prop);
                 }
+
+                // always remove the date
+                prop.setCreationDate(null);
+                prop.setModificationDate(null);
             }
         }
     }

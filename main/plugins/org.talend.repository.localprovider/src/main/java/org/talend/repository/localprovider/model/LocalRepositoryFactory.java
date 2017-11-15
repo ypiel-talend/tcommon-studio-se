@@ -76,8 +76,8 @@ import org.talend.commons.exception.ExceptionHandler;
 import org.talend.commons.exception.LoginException;
 import org.talend.commons.exception.PersistenceException;
 import org.talend.commons.exception.ResourceNotFoundException;
-import org.talend.commons.runtime.model.emf.provider.CreateOptionProvider;
 import org.talend.commons.runtime.model.emf.provider.EmfResourcesFactoryReader;
+import org.talend.commons.runtime.model.emf.provider.ResourceOption;
 import org.talend.commons.runtime.model.repository.ERepositoryStatus;
 import org.talend.commons.ui.runtime.image.ImageUtils;
 import org.talend.commons.utils.VersionUtils;
@@ -181,8 +181,6 @@ public class LocalRepositoryFactory extends AbstractEMFRepositoryFactory impleme
     private static final String BIN = "bin"; //$NON-NLS-1$
 
     private static Logger log = Logger.getLogger(LocalRepositoryFactory.class);
-
-    private final static CreateOptionProvider createOptionProvider = new CreateOptionProvider();
 
     private static LocalRepositoryFactory singleton = null;
 
@@ -2668,8 +2666,9 @@ public class LocalRepositoryFactory extends AbstractEMFRepositoryFactory impleme
 
     @Override
     public void create(Project project, Item item, IPath path, boolean... isImportItem) throws PersistenceException {
-        final String optionName = createOptionProvider.getName();
-        EmfResourcesFactoryReader.INSTANCE.getSaveOptionsProviders().put(optionName, createOptionProvider);
+        final ResourceOption creatation = ResourceOption.CREATATION;
+        final String optionName = creatation.getName();
+        EmfResourcesFactoryReader.INSTANCE.getSaveOptionsProviders().put(optionName, creatation.getProvider());
         try {
             delegateCreate(project, item, path, isImportItem);
         } finally {
