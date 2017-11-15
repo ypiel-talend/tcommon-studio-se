@@ -40,31 +40,6 @@ public final class ItemProductValuesHelper {
         return DATEFORMAT.format(new Date());
     }
 
-    public static boolean setValuesWhenModify(Property property, Date date) {
-        if (property == null) {
-            return false;
-        }
-        if (date == null) {
-            date = new Date();
-        }
-
-        if (!GlobalServiceRegister.getDefault().isServiceRegistered(IBrandingService.class)) {
-            return false;
-        }
-
-        EMap additionalProperties = property.getAdditionalProperties();
-        IBrandingService brandingService = (IBrandingService) GlobalServiceRegister.getDefault().getService(
-                IBrandingService.class);
-
-        additionalProperties.put(ItemProductKeys.FULLNAME.getModifiedKey(), brandingService.getFullProductName());
-        additionalProperties.put(ItemProductKeys.VERSION.getModifiedKey(), VersionUtils.getDisplayVersion());
-        additionalProperties.put(ItemProductKeys.DATE.getModifiedKey(), DATEFORMAT.format(date));
-
-        property.setModificationDate(null);
-
-        return true;
-    }
-
     public static boolean setValuesWhenCreate(Property property, Date date) {
         if (property == null) {
             return false;
@@ -90,23 +65,50 @@ public final class ItemProductValuesHelper {
         return true;
     }
 
+    public static boolean setValuesWhenModify(Property property, Date date) {
+        if (property == null) {
+            return false;
+        }
+        if (date == null) {
+            date = new Date();
+        }
+
+        if (!GlobalServiceRegister.getDefault().isServiceRegistered(IBrandingService.class)) {
+            return false;
+        }
+
+        EMap additionalProperties = property.getAdditionalProperties();
+        IBrandingService brandingService = (IBrandingService) GlobalServiceRegister.getDefault().getService(
+                IBrandingService.class);
+
+        additionalProperties.put(ItemProductKeys.FULLNAME.getModifiedKey(), brandingService.getFullProductName());
+        additionalProperties.put(ItemProductKeys.VERSION.getModifiedKey(), VersionUtils.getDisplayVersion());
+        additionalProperties.put(ItemProductKeys.DATE.getModifiedKey(), DATEFORMAT.format(date));
+
+        property.setModificationDate(null);
+
+        return true;
+    }
+
     public static boolean setValuesWhenMigrate(Property property) {
         if (property == null) {
             return false;
         }
         Project project = ProjectManager.getInstance().getProject(property);
         if (project == null) {
-            return false;
+            project = ProjectManager.getInstance().getCurrentProject().getEmfProject();
         }
         EMap additionalProperties = property.getAdditionalProperties();
 
         String productStr = project.getProductVersion();
         Map<String, String> productValues = parseProduct(productStr);
-        if (productValues.isEmpty()) {
-            return false;
+
+        String fullname = productStr; // use the whole value
+        String version = null;
+        if (!productValues.isEmpty()) {
+            fullname = productValues.keySet().iterator().next();
+            version = productValues.get(fullname);
         }
-        String fullname = productValues.keySet().iterator().next();
-        String version = productValues.get(fullname);
 
         String curDateTime = getCurDateTime();
         //

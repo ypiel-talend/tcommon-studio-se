@@ -19,15 +19,31 @@ import java.util.Map;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.xmi.XMLResource;
 import org.talend.commons.runtime.model.emf.provider.CreateOptionProvider;
+import org.talend.commons.runtime.model.emf.provider.OptionProvider;
 import org.talend.commons.runtime.model.emf.provider.ResourceHandler;
 import org.talend.core.model.properties.PropertiesPackage;
 import org.talend.core.model.properties.Property;
+import org.talend.core.runtime.repository.item.ItemProductKeys;
 import org.talend.core.runtime.repository.item.ItemProductValuesHelper;
 
 /**
  * DOC ggu class global comment. Detailled comment
  */
 public class ProductValuesResourceHandler extends ResourceHandler {
+
+    public static final OptionProvider migrationOption = new OptionProvider() {
+
+        @Override
+        public String getName() {
+            return "option_migration";
+        }
+
+        @Override
+        public Object getValue() {
+            return Boolean.TRUE;
+        }
+
+    };
 
     @Override
     public void preSave(Object resource, OutputStream outputStream, Map<?, ?> options) {
@@ -40,11 +56,22 @@ public class ProductValuesResourceHandler extends ResourceHandler {
                     ItemProductValuesHelper.setValuesWhenCreate(prop, saveDate);
                 }
 
-                ItemProductValuesHelper.setValuesWhenModify(prop, saveDate);
+                // if migration, nothing to do, becuase it have been processed in migration task
+                if (!options.containsKey(migrationOption.getName())) {
 
-                // always remove the date
-                prop.setCreationDate(null);
-                prop.setModificationDate(null);
+                    if (prop.getAdditionalProperties().containsKey(ItemProductKeys.FULLNAME.getModifiedKey())
+                            || prop.getAdditionalProperties().containsKey(ItemProductKeys.FULLNAME.getCreatedKey())) {
+                        // if existed, just do update
+                        ItemProductValuesHelper.setValuesWhenModify(prop, saveDate);
+                    } else {// no any keys, do migration too.
+                            // currently, especially when copy/paste items, won't do migration task in first logon
+                        ItemProductValuesHelper.setValuesWhenMigrate(prop);
+                    }
+
+                    // always remove the date
+                    prop.setCreationDate(null);
+                    prop.setModificationDate(null);
+                }
             }
         }
     }
