@@ -25,6 +25,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.talend.core.language.ECodeLanguage;
 import org.talend.core.language.LanguageManager;
 import org.talend.core.model.context.ContextUtils;
+import org.talend.core.model.metadata.ISAPConstant;
 import org.talend.core.model.metadata.builder.connection.AdditionalConnectionProperty;
 import org.talend.core.model.metadata.builder.connection.ConnectionFactory;
 import org.talend.core.model.metadata.builder.connection.FTPConnection;
@@ -56,17 +57,6 @@ public final class OtherConnectionContextUtils {
     private static final ECodeLanguage LANGUAGE = LanguageManager.getCurrentLanguage();
 
     private static final String BASIC = "basic";
-
-    // Hana database properties
-    public static final String PROP_DB_HOST = "db.host";//$NON-NLS-1$
-
-    public static final String PROP_DB_PORT = "db.port";//$NON-NLS-1$
-
-    public static final String PROP_DB_SCHEMA = "db.schema";//$NON-NLS-1$
-
-    public static final String PROP_DB_USERNAME = "db.username";//$NON-NLS-1$
-
-    public static final String PROP_DB_PASSWORD = "db.password";//$NON-NLS-1$
 
     /**
      * 
@@ -602,23 +592,23 @@ public final class OtherConnectionContextUtils {
                 // Hana database properties
                 case DbHost:
                     ConnectionContextHelper.createParameters(varList, paramName,
-                            TaggedValueHelper.getValueString(PROP_DB_HOST, conn));
+                            TaggedValueHelper.getValueString(ISAPConstant.PROP_DB_HOST, conn));
                     break;
                 case DbPort:
                     ConnectionContextHelper.createParameters(varList, paramName,
-                            TaggedValueHelper.getValueString(PROP_DB_PORT, conn));
+                            TaggedValueHelper.getValueString(ISAPConstant.PROP_DB_PORT, conn));
                     break;
                 case DbSchema:
                     ConnectionContextHelper.createParameters(varList, paramName,
-                            TaggedValueHelper.getValueString(PROP_DB_SCHEMA, conn));
+                            TaggedValueHelper.getValueString(ISAPConstant.PROP_DB_SCHEMA, conn));
                     break;
                 case DbUsername:
                     ConnectionContextHelper.createParameters(varList, paramName,
-                            TaggedValueHelper.getValueString(PROP_DB_USERNAME, conn));
+                            TaggedValueHelper.getValueString(ISAPConstant.PROP_DB_USERNAME, conn));
                     break;
                 case DbPassword:
                     ConnectionContextHelper.createParameters(varList, paramName,
-                            conn.getValue(TaggedValueHelper.getValueString(PROP_DB_PASSWORD, conn), false),
+                            conn.getValue(TaggedValueHelper.getValueString(ISAPConstant.PROP_DB_PASSWORD, conn), false),
                             JavaTypesManager.PASSWORD);
                     break;
                 default:
@@ -713,23 +703,23 @@ public final class OtherConnectionContextUtils {
             break;
         // Hana database properties
         case DbHost:
-            TaggedValueHelper.setTaggedValue(sapConn, PROP_DB_HOST,
+            TaggedValueHelper.setTaggedValue(sapConn, ISAPConstant.PROP_DB_HOST,
                     ContextParameterUtils.getNewScriptCode(sapBasicVarName, LANGUAGE));
             break;
         case DbPort:
-            TaggedValueHelper.setTaggedValue(sapConn, PROP_DB_PORT,
+            TaggedValueHelper.setTaggedValue(sapConn, ISAPConstant.PROP_DB_PORT,
                     ContextParameterUtils.getNewScriptCode(sapBasicVarName, LANGUAGE));
             break;
         case DbSchema:
-            TaggedValueHelper.setTaggedValue(sapConn, PROP_DB_SCHEMA,
+            TaggedValueHelper.setTaggedValue(sapConn, ISAPConstant.PROP_DB_SCHEMA,
                     ContextParameterUtils.getNewScriptCode(sapBasicVarName, LANGUAGE));
             break;
         case DbUsername:
-            TaggedValueHelper.setTaggedValue(sapConn, PROP_DB_USERNAME,
+            TaggedValueHelper.setTaggedValue(sapConn, ISAPConstant.PROP_DB_USERNAME,
                     ContextParameterUtils.getNewScriptCode(sapBasicVarName, LANGUAGE));
             break;
         case DbPassword:
-            TaggedValueHelper.setTaggedValue(sapConn, PROP_DB_PASSWORD,
+            TaggedValueHelper.setTaggedValue(sapConn, ISAPConstant.PROP_DB_PASSWORD,
                     ContextParameterUtils.getNewScriptCode(sapBasicVarName, LANGUAGE));
             break;
         default:
@@ -768,21 +758,21 @@ public final class OtherConnectionContextUtils {
             sapProperty.setValue(contextPropertyValue);
         }
         // Hana database properties
-        String dbHost = TalendQuoteUtils.removeQuotes(
-                ConnectionContextHelper.getOriginalValue(contextType, TaggedValueHelper.getValueString(PROP_DB_HOST, conn)));
-        String dbPort = TalendQuoteUtils.removeQuotes(
-                ConnectionContextHelper.getOriginalValue(contextType, TaggedValueHelper.getValueString(PROP_DB_PORT, conn)));
-        String dbSchema = TalendQuoteUtils.removeQuotes(
-                ConnectionContextHelper.getOriginalValue(contextType, TaggedValueHelper.getValueString(PROP_DB_SCHEMA, conn)));
-        String dbUsername = TalendQuoteUtils.removeQuotes(
-                ConnectionContextHelper.getOriginalValue(contextType, TaggedValueHelper.getValueString(PROP_DB_USERNAME, conn)));
+        String dbHost = TalendQuoteUtils.removeQuotes(ConnectionContextHelper.getOriginalValue(contextType,
+                TaggedValueHelper.getValueString(ISAPConstant.PROP_DB_HOST, conn)));
+        String dbPort = TalendQuoteUtils.removeQuotes(ConnectionContextHelper.getOriginalValue(contextType,
+                TaggedValueHelper.getValueString(ISAPConstant.PROP_DB_PORT, conn)));
+        String dbSchema = TalendQuoteUtils.removeQuotes(ConnectionContextHelper.getOriginalValue(contextType,
+                TaggedValueHelper.getValueString(ISAPConstant.PROP_DB_SCHEMA, conn)));
+        String dbUsername = TalendQuoteUtils.removeQuotes(ConnectionContextHelper.getOriginalValue(contextType,
+                TaggedValueHelper.getValueString(ISAPConstant.PROP_DB_USERNAME, conn)));
         String dbPassword = TalendQuoteUtils.removeQuotes(ConnectionContextHelper.getOriginalValue(contextType,
-                conn.getValue(TaggedValueHelper.getValueString(PROP_DB_PASSWORD, conn), false)));
-        TaggedValueHelper.setTaggedValue(conn, PROP_DB_HOST, dbHost);
-        TaggedValueHelper.setTaggedValue(conn, PROP_DB_PORT, dbPort);
-        TaggedValueHelper.setTaggedValue(conn, PROP_DB_SCHEMA, dbSchema);
-        TaggedValueHelper.setTaggedValue(conn, PROP_DB_USERNAME, dbUsername);
-        TaggedValueHelper.setTaggedValue(conn, PROP_DB_PASSWORD, conn.getValue(dbPassword, true));
+                conn.getValue(TaggedValueHelper.getValueString(ISAPConstant.PROP_DB_PASSWORD, conn), false)));
+        TaggedValueHelper.setTaggedValue(conn, ISAPConstant.PROP_DB_HOST, dbHost);
+        TaggedValueHelper.setTaggedValue(conn, ISAPConstant.PROP_DB_PORT, dbPort);
+        TaggedValueHelper.setTaggedValue(conn, ISAPConstant.PROP_DB_SCHEMA, dbSchema);
+        TaggedValueHelper.setTaggedValue(conn, ISAPConstant.PROP_DB_USERNAME, dbUsername);
+        TaggedValueHelper.setTaggedValue(conn, ISAPConstant.PROP_DB_PASSWORD, conn.getValue(dbPassword, true));
     }
 
     public static SAPConnection cloneOriginalValueSAPConnection(SAPConnection fileConn, ContextType contextType) {
@@ -814,20 +804,20 @@ public final class OtherConnectionContextUtils {
         }
         // Hana database properties
         String dbHost = ConnectionContextHelper.getOriginalValue(contextType,
-                TaggedValueHelper.getValueString(PROP_DB_HOST, fileConn));
+                TaggedValueHelper.getValueString(ISAPConstant.PROP_DB_HOST, fileConn));
         String dbPort = ConnectionContextHelper.getOriginalValue(contextType,
-                TaggedValueHelper.getValueString(PROP_DB_PORT, fileConn));
+                TaggedValueHelper.getValueString(ISAPConstant.PROP_DB_PORT, fileConn));
         String dbSchema = ConnectionContextHelper.getOriginalValue(contextType,
-                TaggedValueHelper.getValueString(PROP_DB_SCHEMA, fileConn));
+                TaggedValueHelper.getValueString(ISAPConstant.PROP_DB_SCHEMA, fileConn));
         String dbUsername = ConnectionContextHelper.getOriginalValue(contextType,
-                TaggedValueHelper.getValueString(PROP_DB_USERNAME, fileConn));
+                TaggedValueHelper.getValueString(ISAPConstant.PROP_DB_USERNAME, fileConn));
         String dbPassword = ConnectionContextHelper.getOriginalValue(contextType,
-                fileConn.getValue(TaggedValueHelper.getValueString(PROP_DB_PASSWORD, fileConn), false));
-        TaggedValueHelper.setTaggedValue(cloneConn, PROP_DB_HOST, dbHost);
-        TaggedValueHelper.setTaggedValue(cloneConn, PROP_DB_PORT, dbPort);
-        TaggedValueHelper.setTaggedValue(cloneConn, PROP_DB_SCHEMA, dbSchema);
-        TaggedValueHelper.setTaggedValue(cloneConn, PROP_DB_USERNAME, dbUsername);
-        TaggedValueHelper.setTaggedValue(cloneConn, PROP_DB_PASSWORD, dbPassword);
+                fileConn.getValue(TaggedValueHelper.getValueString(ISAPConstant.PROP_DB_PASSWORD, fileConn), false));
+        TaggedValueHelper.setTaggedValue(cloneConn, ISAPConstant.PROP_DB_HOST, dbHost);
+        TaggedValueHelper.setTaggedValue(cloneConn, ISAPConstant.PROP_DB_PORT, dbPort);
+        TaggedValueHelper.setTaggedValue(cloneConn, ISAPConstant.PROP_DB_SCHEMA, dbSchema);
+        TaggedValueHelper.setTaggedValue(cloneConn, ISAPConstant.PROP_DB_USERNAME, dbUsername);
+        TaggedValueHelper.setTaggedValue(cloneConn, ISAPConstant.PROP_DB_PASSWORD, dbPassword);
 
         ConnectionContextHelper.cloneConnectionProperties(fileConn, cloneConn);
 
