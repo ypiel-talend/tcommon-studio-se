@@ -41,28 +41,29 @@ public class ProductValuesResourceHandler extends ResourceHandler {
                  * 1) import, will do create also, and created and modified keys will be set in migration task. and set
                  * the import date in ImportResourcesHandler. Else, if existed already nothing to do.
                  * 
-                 * 2) migrate with 2 cases, when import, will do point 1. when logon, just do migration task
+                 * 2) migrate in 2 cases, when import, will do point 1. when logon, just do migration task
                  */
-                if (options.containsKey(ResourceOption.ITEM_IMPORTATION.getName())
-                        || options.containsKey(ResourceOption.DEMO_IMPORTATION.getName())
-                        || options.containsKey(ResourceOption.MIGRATION.getName())) {
-                    return;
+
+                if (!options.containsKey(ResourceOption.ITEM_IMPORTATION.getName())
+                        && !options.containsKey(ResourceOption.DEMO_IMPORTATION.getName())
+                        && !options.containsKey(ResourceOption.MIGRATION.getName())) {
+
+                    Date saveDate = new Date();
+                    if (options.containsKey(ResourceOption.CREATATION.getName())) {
+                        ItemProductValuesHelper.setValuesWhenCreate(prop, saveDate);
+                    }
+
+                    // generally, work for modification in studio
+                    if (ItemProductValuesHelper.existed(prop)) {
+                        // if existed, just do update
+                        ItemProductValuesHelper.setValuesWhenModify(prop, saveDate);
+                    } else {// no any keys, do migration too.
+                            // currently, especially when copy/paste items, if no migration task to do
+                        ItemProductValuesHelper.setValuesWhenMigrate(prop);
+                    }
                 }
 
-                Date saveDate = new Date();
-                if (options.containsKey(ResourceOption.CREATATION.getName())) {
-                    ItemProductValuesHelper.setValuesWhenCreate(prop, saveDate);
-                }
-
-                if (ItemProductValuesHelper.existed(prop)) {
-                    // if existed, just do update
-                    ItemProductValuesHelper.setValuesWhenModify(prop, saveDate);
-                } else {// no any keys, do migration too.
-                        // currently, especially when copy/paste items, won't do migration task in first logon
-                    ItemProductValuesHelper.setValuesWhenMigrate(prop);
-                }
-
-                // always remove the date
+                // always remove the date when save
                 prop.setCreationDate(null);
                 prop.setModificationDate(null);
             }
