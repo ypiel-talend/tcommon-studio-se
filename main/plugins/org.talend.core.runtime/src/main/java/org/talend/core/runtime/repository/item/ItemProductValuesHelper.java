@@ -13,6 +13,7 @@
 package org.talend.core.runtime.repository.item;
 
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -114,7 +115,9 @@ public final class ItemProductValuesHelper {
         if (property == null) {
             return false;
         }
-
+        if (existed(property)) { // if existed, nothing to do
+            return false;
+        }
         if (project == null) { // use current project instead
             project = ProjectManager.getInstance().getCurrentProject().getEmfProject();
         }
@@ -172,13 +175,16 @@ public final class ItemProductValuesHelper {
         additionalProperties.put(ItemProductKeys.VERSION.getImportKey(), version);
         additionalProperties.put(ItemProductKeys.DATE.getImportKey(), getCurDateTime());
 
-        // also migrate other keys first, because in migration task, only for current project
+        // if need, migrate other keys first, because in migration task, only for current project
         setValuesWhenMigrate(property, project);
 
         return true;
     }
 
     static Map<String, String> parseProduct(String value) {
+        if (value == null || value.isEmpty()) {
+            return Collections.emptyMap();
+        }
         Map<String, String> result = new HashMap<String, String>();
         int sepIndex = value.indexOf('-');
         if (sepIndex > 0) {

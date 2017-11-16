@@ -53,14 +53,12 @@ public class ProductValuesResourceHandler extends ResourceHandler {
                         ItemProductValuesHelper.setValuesWhenCreate(prop, saveDate);
                     }
 
+                    // if no any keys, do migration too.
+                    // currently, especially when copy/paste items, if no migration task to do
+                    ItemProductValuesHelper.setValuesWhenMigrate(prop);
+
                     // generally, work for modification in studio
-                    if (ItemProductValuesHelper.existed(prop)) {
-                        // if existed, just do update
-                        ItemProductValuesHelper.setValuesWhenModify(prop, saveDate);
-                    } else {// no any keys, do migration too.
-                            // currently, especially when copy/paste items, if no migration task to do
-                        ItemProductValuesHelper.setValuesWhenMigrate(prop);
-                    }
+                    ItemProductValuesHelper.setValuesWhenModify(prop, saveDate);
                 }
 
                 // always remove the date when save
