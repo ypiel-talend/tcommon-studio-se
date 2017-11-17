@@ -82,7 +82,6 @@ public class AggregatorPomsHelper {
     public void installPom(IFile pomFile, boolean current) throws Exception {
         Model model = MavenPlugin.getMaven().readModel(pomFile.getLocation().toFile());
         if (!isPomInstalled(model.getGroupId(), model.getArtifactId(), model.getVersion())) {
-            pomFile = getProjectPomsFolder().getFile(TalendMavenConstants.POM_FILE_NAME);
             MavenPomCommandLauncher launcher = new MavenPomCommandLauncher(pomFile, TalendMavenConstants.GOAL_INSTALL);
             if (current) {
                 Map<String, Object> argumentsMap = new HashMap<>();
