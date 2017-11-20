@@ -148,9 +148,10 @@ public class PomIdsHelper {
                     return groupId;
                 }
             }
-            Project currentProject = ProjectManager.getInstance().getCurrentProject();
-            if (currentProject != null) {
-                return getJobGroupId(currentProject.getTechnicalLabel());
+            String projectTechName = ProjectManager.getInstance().getProject(property).getTechnicalLabel();
+            Project project = ProjectManager.getInstance().getProjectFromProjectTechLabel(projectTechName);
+            if (project != null) {
+                return getJobGroupId(project.getTechnicalLabel());
             }
         }
         return getJobGroupId((String) null);

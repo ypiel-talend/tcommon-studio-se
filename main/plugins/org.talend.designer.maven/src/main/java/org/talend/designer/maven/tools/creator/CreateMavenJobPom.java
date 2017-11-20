@@ -17,7 +17,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -233,8 +232,8 @@ public class CreateMavenJobPom extends AbstractMavenProcessorPom {
 
         checkPomProperty(properties, "talend.job.version", ETalendMavenVariables.TalendJobVersion, property.getVersion());
 
-        checkPomProperty(properties, "talend.job.date", ETalendMavenVariables.JobDate,
-                jobInfoProp.getProperty(JobInfoProperties.DATE, JobInfoProperties.DATAFORMAT.format(new Date())));
+        checkPomProperty(properties, "maven.build.timestamp.format", ETalendMavenVariables.JobDateFormat,
+                JobInfoProperties.JOB_DATE_FORMAT);
 
         checkPomProperty(properties, "talend.job.context", ETalendMavenVariables.JobContext,
                 jobInfoProp.getProperty(JobInfoProperties.CONTEXT_NAME, context.getName()));

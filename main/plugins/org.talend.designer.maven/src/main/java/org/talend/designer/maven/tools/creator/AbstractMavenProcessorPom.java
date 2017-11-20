@@ -204,11 +204,9 @@ public abstract class AbstractMavenProcessorPom extends CreateMavenBundleTemplat
                         continue;
                     }
                     Property property = jobInfo.getProcessItem().getProperty();
-                    String subjobProjectTechName = ProjectManager.getInstance().getProject(property).getTechnicalLabel();
-                    org.talend.core.model.general.Project project = ProjectManager.getInstance().getProjectFromProjectTechLabel(subjobProjectTechName);
-                    String groupId = PomIdsHelper.getProjectGroupId(project);
+                    String groupId = PomIdsHelper.getJobGroupId(property);
                     String artifactId = PomIdsHelper.getJobArtifactId(jobInfo);
-                    String version = PomIdsHelper.getJobVersion(jobInfo.getProcessItem().getProperty());
+                    String version = PomIdsHelper.getJobVersion(property);
 
                     // try to get the pom version of children job and load from the pom file.
                     String childPomFileName = PomUtil.getPomFileName(jobInfo.getJobName(), jobInfo.getJobVersion());
