@@ -37,7 +37,7 @@ public final class ItemProductValuesHelper {
      */
     static final SimpleDateFormat DATEFORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
-    private static String getCurDateTime() {
+    public static String getCurDateTime() {
         return DATEFORMAT.format(new Date());
     }
 
@@ -50,6 +50,11 @@ public final class ItemProductValuesHelper {
                 || additionalProperties.containsKey(ItemProductKeys.FULLNAME.getCreatedKey());
     }
 
+    /**
+     * 
+     * Set the created keys with date
+     * 
+     */
     public static boolean setValuesWhenCreate(Property property, Date date) {
         if (property == null) {
             return false;
@@ -75,6 +80,10 @@ public final class ItemProductValuesHelper {
         return true;
     }
 
+    /**
+     * 
+     * Set the modified keys with date when save .properties file
+     */
     public static boolean setValuesWhenModify(Property property, Date date) {
         if (property == null) {
             return false;
@@ -100,6 +109,10 @@ public final class ItemProductValuesHelper {
         return true;
     }
 
+    /**
+     * 
+     * Try to migrate the created and modified date to keys.
+     */
     public static boolean setValuesWhenMigrate(Property property) {
         if (property == null) {
             return false;
@@ -122,10 +135,7 @@ public final class ItemProductValuesHelper {
             project = ProjectManager.getInstance().getCurrentProject().getEmfProject();
         }
 
-        EMap additionalProperties = property.getAdditionalProperties();
-
-        String productStr = project.getProductVersion();
-        Map<String, String> productValues = parseProduct(productStr);
+        Map<String, String> productValues = getProductValues(project);
         if (productValues.isEmpty()) {
             return false;
         }
@@ -134,13 +144,25 @@ public final class ItemProductValuesHelper {
 
         String curDateTime = getCurDateTime();
         //
+        migrateValues(property, fullname, version, curDateTime);
+
+        return true;
+    }
+
+    private static void migrateValues(Property property, String fullname, String version, String datetime) {
+        if (existed(property)) { // if existed, nothing to do
+            return;
+        }
+        EMap additionalProperties = property.getAdditionalProperties();
+
+        //
         Date creationDate = property.getCreationDate();
         additionalProperties.put(ItemProductKeys.FULLNAME.getCreatedKey(), fullname);
         additionalProperties.put(ItemProductKeys.VERSION.getCreatedKey(), version);
         if (creationDate != null) {
             additionalProperties.put(ItemProductKeys.DATE.getCreatedKey(), DATEFORMAT.format(creationDate));
         } else {
-            additionalProperties.put(ItemProductKeys.DATE.getCreatedKey(), curDateTime);
+            additionalProperties.put(ItemProductKeys.DATE.getCreatedKey(), datetime);
         }
         property.setCreationDate(null); // move the date to additional properties
 
@@ -151,34 +173,50 @@ public final class ItemProductValuesHelper {
         if (modificationDate != null) {
             additionalProperties.put(ItemProductKeys.DATE.getModifiedKey(), DATEFORMAT.format(modificationDate));
         } else {
-            additionalProperties.put(ItemProductKeys.DATE.getModifiedKey(), curDateTime);
+            additionalProperties.put(ItemProductKeys.DATE.getModifiedKey(), datetime);
         }
         property.setModificationDate(null); // move the date to additional properties
 
-        return true;
     }
 
+    /**
+     * When import, try to add import keys and add migration keys if possibly.
+     * 
+     */
     public static boolean setValuesWhenImport(Property property, Project project) {
         if (property == null || project == null) {
             return false;
         }
-        EMap additionalProperties = property.getAdditionalProperties();
-        String productVersion = project.getProductVersion();
-        Map<String, String> productValues = parseProduct(productVersion);
+
+        Map<String, String> productValues = getProductValues(project);
         if (productValues.isEmpty()) {
             return false;
         }
         String fullname = productValues.keySet().iterator().next();
         String version = productValues.get(fullname);
+        String curDateTime = getCurDateTime();
+
+        return setImportValues(property, fullname, version, curDateTime);
+    }
+
+    public static boolean setImportValues(Property property, String fullname, String version, String datetime) {
+        EMap additionalProperties = property.getAdditionalProperties();
 
         additionalProperties.put(ItemProductKeys.FULLNAME.getImportKey(), fullname);
         additionalProperties.put(ItemProductKeys.VERSION.getImportKey(), version);
-        additionalProperties.put(ItemProductKeys.DATE.getImportKey(), getCurDateTime());
+        additionalProperties.put(ItemProductKeys.DATE.getImportKey(), datetime);
 
         // if need, migrate other keys first, because in migration task, only for current project
-        setValuesWhenMigrate(property, project);
+        migrateValues(property, fullname, version, datetime);
 
         return true;
+    }
+
+    public static Map<String, String> getProductValues(Project project) {
+        if (project == null) {
+            return Collections.emptyMap();
+        }
+        return parseProduct(project.getProductVersion());
     }
 
     static Map<String, String> parseProduct(String value) {

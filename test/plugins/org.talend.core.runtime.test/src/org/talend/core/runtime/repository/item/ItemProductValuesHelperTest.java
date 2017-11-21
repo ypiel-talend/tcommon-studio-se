@@ -323,7 +323,7 @@ public class ItemProductValuesHelperTest {
 
         Property prop = PropertiesFactory.eINSTANCE.createProperty();
         EMap additionalProp = prop.getAdditionalProperties();
-        additionalProp.put(ItemProductKeys.FULLNAME.getModifiedKey(), "XXXX"); // set flag to avoid do migrating
+        additionalProp.put(ItemProductKeys.FULLNAME.getModifiedKey(), "XXXX"); // set flag to avoid migrating
 
         boolean set = ItemProductValuesHelper.setValuesWhenImport(prop, project);
         assertTrue(set);

@@ -39,7 +39,7 @@ public class ProductValuesResourceHandler extends ResourceHandler {
                  * need ignore, when:
                  * 
                  * 1) import, will do create also, and created and modified keys will be set in migration task. and set
-                 * the import date in ImportResourcesHandler. Else, if existed already nothing to do.
+                 * the import date in ItemProductValuesHelper. Else, if existed already nothing to do.
                  * 
                  * 2) migrate in 2 cases, when import, will do point 1. when logon, just do migration task
                  */

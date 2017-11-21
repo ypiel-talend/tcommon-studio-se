@@ -150,7 +150,7 @@
                   
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn="org.talend.commons.runtime.model.emf.provider.IResourceHandler:"/>
+                  <meta.attribute kind="java" basedOn="org.talend.commons.runtime.model.emf.provider.ResourceHandler:"/>
                </appinfo>
             </annotation>
          </attribute>
