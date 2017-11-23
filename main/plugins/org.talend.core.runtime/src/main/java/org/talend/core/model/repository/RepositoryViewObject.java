@@ -53,6 +53,8 @@ import org.talend.core.model.properties.LinkDocumentationItem;
 import org.talend.core.model.properties.PropertiesFactory;
 import org.talend.core.model.properties.Property;
 import org.talend.core.model.properties.User;
+import org.talend.core.runtime.repository.item.ItemProductKeys;
+import org.talend.core.runtime.util.ItemDateParser;
 import org.talend.core.ui.IJobletProviderService;
 import org.talend.core.ui.ISparkJobletProviderService;
 import org.talend.core.ui.ISparkStreamingJobletProviderService;
@@ -126,9 +128,9 @@ public class RepositoryViewObject implements IRepositoryViewObject {
     public RepositoryViewObject(Property property, boolean avoidGuiInfos) {
         this.id = property.getId();
         this.author = property.getAuthor();
-        this.creationDate = property.getCreationDate();
+        this.creationDate = ItemDateParser.parseAdditionalDate(property, ItemProductKeys.DATE.getCreatedKey());
         this.description = property.getDescription();
-        this.modificationDate = property.getModificationDate();
+        this.modificationDate = ItemDateParser.parseAdditionalDate(property, ItemProductKeys.DATE.getModifiedKey());
         this.label = property.getLabel();
         this.displayName = property.getDisplayName();
         this.purpose = property.getPurpose();
@@ -340,9 +342,9 @@ public class RepositoryViewObject implements IRepositoryViewObject {
             modified = factory.isModified(property);
             this.id = property.getId();
             this.author = property.getAuthor();
-            this.creationDate = property.getCreationDate();
+            this.creationDate = ItemDateParser.parseAdditionalDate(property, ItemProductKeys.DATE.getCreatedKey());
             this.description = property.getDescription();
-            this.modificationDate = property.getModificationDate();
+            this.modificationDate = ItemDateParser.parseAdditionalDate(property, ItemProductKeys.DATE.getModifiedKey());
             this.label = property.getLabel();
             this.displayName = property.getDisplayName();
             this.purpose = property.getPurpose();

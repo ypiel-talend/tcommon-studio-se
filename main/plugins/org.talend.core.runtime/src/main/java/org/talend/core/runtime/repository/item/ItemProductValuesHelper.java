@@ -35,7 +35,7 @@ public final class ItemProductValuesHelper {
     /*
      * 2017-10-09T14:30:19.367+0800
      */
-    static final SimpleDateFormat DATEFORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+    public static final SimpleDateFormat DATEFORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
     public static String getCurDateTime() {
         return DATEFORMAT.format(new Date());

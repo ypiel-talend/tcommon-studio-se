@@ -28,7 +28,7 @@ public enum ResourceOption {
         this(Boolean.TRUE);
     }
 
-    private ResourceOption(Object value) {
+    private ResourceOption(final Object value) {
         this.provider = new OptionProvider() {
 
             @Override
