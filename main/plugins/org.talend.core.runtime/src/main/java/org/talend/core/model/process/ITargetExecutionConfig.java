@@ -50,5 +50,7 @@ public interface ITargetExecutionConfig extends IServerConfiguration {
 	public boolean isVirtualServer();
 	
 	public boolean isActiveServer();
+	
+	public String getEncryptedPassword();
 
 }
