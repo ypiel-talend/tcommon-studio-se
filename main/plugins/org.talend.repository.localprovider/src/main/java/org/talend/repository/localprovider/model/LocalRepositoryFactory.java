@@ -1680,7 +1680,8 @@ public class LocalRepositoryFactory extends AbstractEMFRepositoryFactory impleme
                         || currentVersion.getRepositoryObjectType() == ERepositoryObjectType.JOBLET
                         || currentVersion.getRepositoryObjectType() == ERepositoryObjectType.SPARK_JOBLET
                         || currentVersion.getRepositoryObjectType() == ERepositoryObjectType.SPARK_STREAMING_JOBLET) {
-                    if (coreSerivce.isAlreadyBuilt(project)) {
+                    Project currentProject = ProjectManager.getInstance().getCurrentProject();
+                    if (coreSerivce.isAlreadyBuilt(project) && currentProject != null) {
                         if (currentVersion.getProperty() != null) {
                             coreSerivce.removeItemRelations(currentVersion.getProperty().getItem());
                         }

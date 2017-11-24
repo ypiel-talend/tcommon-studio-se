@@ -771,7 +771,9 @@ public final class ProxyRepositoryFactory implements IProxyRepositoryFactory {
         IRepositoryViewObject object = new RepositoryObject(objToDelete.getProperty());
         boolean isExtendPoint = false;
 
-        fireRepositoryPropertyChange(ERepositoryActionName.DELETE_FOREVER.getName(), null, object);
+        if (isFullLogonFinished()) {
+            fireRepositoryPropertyChange(ERepositoryActionName.DELETE_FOREVER.getName(), null, object);
+        }
         ERepositoryObjectType repositoryObjectType = object.getRepositoryObjectType();
 
         ICoreService coreService = getCoreService();
@@ -806,7 +808,7 @@ public final class ProxyRepositoryFactory implements IProxyRepositoryFactory {
             }
         }
 
-        if (repositoryObjectType == ERepositoryObjectType.PROCESS) {
+        if (repositoryObjectType == ERepositoryObjectType.PROCESS && isFullLogonFinished()) {
             if (GlobalServiceRegister.getDefault().isServiceRegistered(IESBService.class)) {
                 IESBService service = (IESBService) GlobalServiceRegister.getDefault().getService(IESBService.class);
                 if (service != null) {
